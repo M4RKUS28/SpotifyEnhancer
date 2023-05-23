@@ -42,15 +42,28 @@ MainWindow::MainWindow(QWidget *parent)
     actionOption1->setIcon(QIcon(":/maximize_icon.png"));
 
     trayMenu->addSeparator();
-    acstatus = trayMenu->addAction("Status");
+    acstatus = trayMenu->addAction("Autorestart aktivieren");
     acstatus->setCheckable(true);
     trayMenu->addSeparator();
+
+    startSpot = trayMenu->addAction("Spotify starten");
+    startSpot->setIcon(QIcon(":/spotify_original_green.png"));
+    trayMenu->addSeparator();
+
+    stopSpot = trayMenu->addAction("Spotify beenden");
+    stopSpot->setIcon(QIcon(":/close_icon.png"));
+    trayMenu->addSeparator();
+
+
     actionOption2 = trayMenu->addAction("Programm beenden");
     actionOption2->setIcon(QIcon(":/beenden.png"));
 
     connect(actionOption1, &QAction::triggered, this, &MainWindow::onOption1Clicked);
     connect(actionOption2, &QAction::triggered, this, &MainWindow::onOption2Clicked);
     connect(acstatus, &QAction::triggered, this, &MainWindow::acstatusclicked);
+    connect(startSpot, &QAction::triggered, this, &MainWindow::startSpotSlot);
+    connect(stopSpot, &QAction::triggered, this, &MainWindow::stopSpotSlot);
+
 
     // Set up the NOTIFYICONDATA structure
     NOTIFYICONDATA nid;
@@ -169,6 +182,28 @@ void MainWindow::onOption2Clicked()
 void MainWindow::acstatusclicked()
 {
     on_pushButton_clicked();
+}
+
+void MainWindow::startSpotSlot()
+{
+    if( spotmngr->startSpotify() ) {
+        v_window v(nullptr, "Spotify.exe", "", "");
+        if( spotmngr->searchSpotifyWindow(v, 3) ) {
+            spotmngr->sendPlaySignal(v);
+        }
+    }
+
+}
+
+
+
+
+void MainWindow::stopSpotSlot()
+{
+    v_window v(nullptr, "Spotify.exe", "", "");
+    if( spotmngr->searchSpotifyWindow(v, 1) ) {
+        spotmngr->stopSpotify(v);
+    }
 }
 
 
@@ -295,7 +330,7 @@ QString formatiereSekunden(int sekunden)
 void MainWindow::on_actionGesammtzahl_Werbungen_triggered()
 {
     int ges = spotmngr->getGesammtAnzahl();
-    QMessageBox::information(this, "Gesamtanzahl übersprungener Werbungen", "Insgesamt hast du bereits " + QString::number(ges) + " Werbungen übersprungen!\nDamit hast mehr als du dir mehr als " + formatiereSekunden(ges * 30) + " Werbung ersparrt!" );
+    QMessageBox::information(this, "Gesamtanzahl übersprungener Werbungen", "Insgesamt hast du bereits " + QString::number(ges) + " Werbungen übersprungen!\nDamit hast mehr als du dir mehr als " + formatiereSekunden(ges * 30) + " Werbung erspart!" );
 }
 
 

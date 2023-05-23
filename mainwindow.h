@@ -9,7 +9,19 @@
 #include <QTime>
 #include <QString>
 
-
+struct v_window {
+    v_window() { }
+    v_window( HWND window, std::string exe, std::string titel, std::string path,  bool checkInv = false,  std::string checkTitel = "")
+        : window(window), titel(titel) , path(path), exe(exe), checkInv(checkInv), checkTitel(checkTitel), count(0)
+    { }
+    HWND window;
+    std::string titel;
+    std::string path;
+    std::string exe;
+    bool checkInv;
+    std::string checkTitel;
+    int count;
+};
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -43,6 +55,9 @@ private:
     QAction* actionOption1;
     QAction* actionOption2;
     QAction* acstatus;
+    QAction* startSpot;
+    QAction* stopSpot;
+
 
     // Custom message identifier
 #define WM_TRAYICON (WM_USER + 1)
@@ -58,6 +73,9 @@ private slots:
     void onOption1Clicked();
     void onOption2Clicked();
     void acstatusclicked();
+    void startSpotSlot();
+    void stopSpotSlot();
+
 
     void on_pushButton_2_clicked();
 

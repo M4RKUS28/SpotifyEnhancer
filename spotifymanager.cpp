@@ -257,44 +257,27 @@ void SpotifyManager::run()
         }
 
         // Close the Spotify window
-        /*LRESULT result = */SendMessageA(vw.window, WM_CLOSE, 0, 0);
-//        if (result == 0) {
-//            DWORD error = GetLastError();
-//            if (error != ERROR_SUCCESS) {
-//                // Fehler behandeln
-//                std::cerr << "SendMessageA failed with error:" << error << std::endl;
-//            }
-//            continue;
-//        }
+        if( !stopSpotify(vw) )
+            continue;
+        msleep(500);
 
-        sleep(1);
 
         // Start the program again;
-        STARTUPINFOA si;
-        ZeroMemory(&si, sizeof(si));
-        si.cb = sizeof(si);
-        PROCESS_INFORMATION pi;
-        ZeroMemory(&pi, sizeof(pi));
-        if (!CreateProcessA(NULL, const_cast<char*>(exePath.toStdString().c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+        if(!startSpotify()) {
             std::cerr << "Error starting program" << std::endl;
             continue;
         }
-        // Wait for the program to start
-        WaitForInputIdle(pi.hProcess, INFINITE);
-        sleep(1);
+        msleep(500);
 
-        EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw));
-        for(int i = 0; i < 10 && vw.titel == ""; i++) {
-            EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw));
-            sleep(2);
-        }
-        // If the Spotify window is found, close it and restart the program
-        if (vw.titel == "") {
+        // searchSpotifyWindow
+        if( ! searchSpotifyWindow(vw) ) {
             std::cerr << "Couldnd find spoitfy after restart" << std::endl;
             break;
         }
 
-        sendPlaySignal(vw);
+        if( !sendPlaySignal(vw) ) {
+            std::cerr << "Couldnd start playing after restart" << std::endl;
+        }
 
         // Increment loop count
         loop_count++;
@@ -304,12 +287,65 @@ void SpotifyManager::run()
 
 }
 
-void SpotifyManager::sendPlaySignal(v_window new_win)
+
+bool SpotifyManager::stopSpotify(v_window w)
+{
+    // Close the Spotify window
+    LRESULT result = SendMessageA(w.window, WM_CLOSE, 0, 0);
+    if (result == 0) {
+        DWORD error = GetLastError();
+        if (error != ERROR_SUCCESS) {
+            // Fehler behandeln
+            std::cerr << "SendMessageA failed with error:" << error << std::endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+bool SpotifyManager::startSpotify()
+{
+    // Start the program again;
+    STARTUPINFOA si;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&pi, sizeof(pi));
+    if (!CreateProcessA(NULL, const_cast<char*>(exePath.toStdString().c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+        return false;
+
+    // Wait for the program to start
+    WaitForInputIdle(pi.hProcess, INFINITE);
+    return true;
+}
+
+bool SpotifyManager::searchSpotifyWindow(v_window &vw, int trys)
+{
+    EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw));
+    for(int i = 0; i < trys && vw.titel == ""; i++) {
+        EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw));
+        if(i == trys - 1)
+            break;
+        else
+            sleep(2);
+    }
+    // If the Spotify window is found, close it and restart the program
+    if (vw.titel == "")
+        return false;
+    return true;
+}
+
+bool  SpotifyManager::sendPlaySignal(v_window new_win)
 {
     HWND current_foreground_window = GetForegroundWindow();
 
     // Set the program window to the foreground
-    SetForegroundWindow(new_win.window);
+    if (!SetForegroundWindow(new_win.window))
+    {
+        qDebug() << "Fehler beim Festlegen des Fensters als Vordergrundfenster.";
+        return false;
+    }
+
     // Wait for the window to become the foreground window
     while(GetForegroundWindow() != new_win.window)
         Sleep(100);
@@ -319,17 +355,28 @@ void SpotifyManager::sendPlaySignal(v_window new_win)
     ZeroMemory(input, sizeof(input));
     input[0].type = INPUT_KEYBOARD;
     input[0].ki.wVk = VK_MEDIA_PLAY_PAUSE;
-    SendInput(1, input, sizeof(INPUT));
+    if (SendInput(1, input, sizeof(INPUT)) == 0)
+    {
+        qDebug() << "Fehler beim Senden der Tastatureingabe.";
+        return false;
+    }
 
     // Restore the original foreground window
-    SetForegroundWindow(current_foreground_window);
+    if (!SetForegroundWindow(current_foreground_window))
+    {
+        qDebug() << "Fehler beim Wiederherstellen des ursprünglichen Vordergrundfensters.";
+            return false;
+    }
 
 
     auto ct = std::chrono::system_clock::now();
     std::time_t current_time_t = std::chrono::system_clock::to_time_t(ct);
     std::string current_time_str = std::ctime(&current_time_t);
     std::cout << "Restarted at " << current_time_str << std::endl;
+
+    return true;
 }
+
 
 void SpotifyManager::sleep(int seconds)
 {

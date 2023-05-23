@@ -5,7 +5,6 @@
 #include <QThread>
 #include <windows.h>
 
-
 struct v_window;
 
 
@@ -28,6 +27,10 @@ public:
 
 
     int getGesammtAnzahl();
+    bool startSpotify();
+    bool searchSpotifyWindow(v_window &vw, int trys = 10);
+    bool sendPlaySignal(v_window w);
+    bool stopSpotify(v_window w);
 
 private:
 
@@ -40,7 +43,6 @@ private:
     virtual void run();
 
 
-    void sendPlaySignal(v_window w);
 
     void sleep(int seconds);
     void msleep(int m_seconds);

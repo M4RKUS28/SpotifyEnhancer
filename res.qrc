@@ -3,5 +3,7 @@
         <file>spotify-32.ico</file>
         <file>beenden.png</file>
         <file>maximize_icon.png</file>
+        <file>spotify_original_green.png</file>
+        <file>close_icon.png</file>
     </qresource>
 </RCC>
