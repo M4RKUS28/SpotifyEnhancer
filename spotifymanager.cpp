@@ -270,10 +270,11 @@ void SpotifyManager::run()
         msleep(500);
 
         // searchSpotifyWindow
-        if( ! searchSpotifyWindow(vw) ) {
+        if( ! searchSpotifyWindow(&vw) ) {
             std::cerr << "Couldnd find spoitfy after restart" << std::endl;
             break;
         }
+        msleep(500);
 
         if( !sendPlaySignal(vw) ) {
             std::cerr << "Couldnd start playing after restart" << std::endl;
@@ -319,18 +320,19 @@ bool SpotifyManager::startSpotify()
     return true;
 }
 
-bool SpotifyManager::searchSpotifyWindow(v_window &vw, int trys)
+bool SpotifyManager::searchSpotifyWindow(v_window *vw, int trys)
 {
-    EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw));
-    for(int i = 0; i < trys && vw.titel == ""; i++) {
-        EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw));
-        if(i == trys - 1)
+    EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(vw));
+    for(int i = 0; i < trys && vw->titel == ""; i++) {
+        EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(vw));
+        if(i == trys - 1) {
             break;
+        }
         else
-            sleep(2);
+            msleep(750);
     }
     // If the Spotify window is found, close it and restart the program
-    if (vw.titel == "")
+    if (vw->titel == "")
         return false;
     return true;
 }
@@ -342,8 +344,8 @@ bool  SpotifyManager::sendPlaySignal(v_window new_win)
     // Set the program window to the foreground
     if (!SetForegroundWindow(new_win.window))
     {
-        qDebug() << "Fehler beim Festlegen des Fensters als Vordergrundfenster.";
-        return false;
+        qDebug() << "Fehler beim Festlegen des Fensters als Vordergrundfenster." << GetLastError();
+//        return false;
     }
 
     // Wait for the window to become the foreground window
@@ -365,7 +367,7 @@ bool  SpotifyManager::sendPlaySignal(v_window new_win)
     if (!SetForegroundWindow(current_foreground_window))
     {
         qDebug() << "Fehler beim Wiederherstellen des ursprünglichen Vordergrundfensters.";
-            return false;
+//            return false;
     }
 
 

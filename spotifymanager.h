@@ -28,7 +28,7 @@ public:
 
     int getGesammtAnzahl();
     bool startSpotify();
-    bool searchSpotifyWindow(v_window &vw, int trys = 10);
+    bool searchSpotifyWindow(v_window *vw, int trys = 30);
     bool sendPlaySignal(v_window w);
     bool stopSpotify(v_window w);
 

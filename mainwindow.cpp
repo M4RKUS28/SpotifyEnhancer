@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     actionOption1->setIcon(QIcon(":/maximize_icon.png"));
 
     trayMenu->addSeparator();
-    acstatus = trayMenu->addAction("Autorestart aktivieren");
+    acstatus = trayMenu->addAction("Werbung entfernen");
     acstatus->setCheckable(true);
     trayMenu->addSeparator();
 
@@ -118,6 +118,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(spotmngr, SIGNAL(updateReq()), this, SLOT(updateCounts()));
     connect(spotmngr, SIGNAL(stopedSpot()), this, SLOT(showThis()));
 
+
+//    // Handle the tray icon context menu
+//    connect(this, &MainWindow::customContextMenuRequested, this, &MainWindow::showContextMenu);
+//    connect(this, &MainWindow::mousePressEvent, this, &MainWindow::onTrayIconClicked);
+
     on_pushButton_clicked();
 
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
@@ -155,7 +160,7 @@ bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr *)
     MSG* msg = static_cast<MSG*>(message);
     if (msg->message == WM_TRAYICON)
     {
-        if (msg->lParam == WM_RBUTTONUP)
+        if (msg->lParam == WM_RBUTTONUP || msg->lParam == WM_LBUTTONUP )
         {
             POINT cursorPos;
             GetCursorPos(&cursorPos);
@@ -166,6 +171,32 @@ bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr *)
     return false;
 }
 
+//void MainWindow::showContextMenu(const QPoint &pos)
+//{
+//    QPoint globalPos = mapToGlobal(pos);
+//    trayMenu->exec(globalPos);
+//}
+
+//void MainWindow::onTrayIconClicked(QMouseEvent* event)
+//{
+//    if (event->button() == Qt::LeftButton)
+//    {
+//        qDebug() << "CLICK";
+//        // Handle left-click event here
+//        // Show or hide the window, for example
+//        if (isHidden())
+//            show();
+//        else
+//            hide();
+//    }
+//    else if (event->button() == Qt::RightButton)
+//    {
+//        // Handle right-click event here
+//        // Show the context menu
+//        QPoint pos = mapFromGlobal(event->globalPos());
+//        emit customContextMenuRequested(pos);
+//    }
+//}
 
 void MainWindow::onOption1Clicked()
 {
@@ -188,7 +219,7 @@ void MainWindow::startSpotSlot()
 {
     if( spotmngr->startSpotify() ) {
         v_window v(nullptr, "Spotify.exe", "", "");
-        if( spotmngr->searchSpotifyWindow(v, 3) ) {
+        if( spotmngr->searchSpotifyWindow(&v, 5) ) {
             spotmngr->sendPlaySignal(v);
         }
     }
@@ -201,7 +232,7 @@ void MainWindow::startSpotSlot()
 void MainWindow::stopSpotSlot()
 {
     v_window v(nullptr, "Spotify.exe", "", "");
-    if( spotmngr->searchSpotifyWindow(v, 1) ) {
+    if( spotmngr->searchSpotifyWindow(&v, 1) ) {
         spotmngr->stopSpotify(v);
     }
 }
@@ -336,7 +367,6 @@ void MainWindow::on_actionGesammtzahl_Werbungen_triggered()
 
 void MainWindow::on_action_ber_triggered()
 {
-    QMessageBox::information(this, "Über", "M4RKUS!" );
-
+    QMessageBox::information(this, "Über", "M4RKUS!\nVersion: " + this->version );
 }
 

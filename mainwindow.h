@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QTime>
 #include <QString>
+#include <QMouseEvent>
 
 struct v_window {
     v_window() { }
@@ -30,6 +31,8 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
+    QString version = "1.2";
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -64,6 +67,10 @@ private:
 
     // Handle system tray events
     virtual bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result);
+
+//    void showContextMenu(const QPoint& pos);
+//    void onTrayIconClicked(QMouseEvent* event);
+
 
     // QObject interface
 private slots:
