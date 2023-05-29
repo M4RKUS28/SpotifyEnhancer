@@ -32,7 +32,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    QString version = "1.2";
+    QString version = "1.3";
 
 public:
     MainWindow(QWidget *parent = nullptr);

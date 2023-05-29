@@ -36,15 +36,29 @@ std::string GetExecutablePathFromWindowHandle(HWND hwnd)
 {
     std::string path;
     DWORD pid = 0;
-    GetWindowThreadProcessId(hwnd, &pid);
+    if (!GetWindowThreadProcessId(hwnd, &pid)) {
+        // Failed to get process ID
+        DWORD error = GetLastError();
+        qDebug() << "Failed to get process ID. Error code:" << error;
+        return "";
+    }
+
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
     if (hProcess != NULL) {
         std::vector<char> buffer(MAX_PATH);
         DWORD size = GetModuleFileNameExA(hProcess, NULL, buffer.data(), static_cast<DWORD>(buffer.size()));
         if (size != 0 && size < buffer.size()) {
             path = buffer.data();
+        } else {
+            // Failed to get module file name
+            DWORD error = GetLastError();
+            qDebug() << "Failed to get module file name. Error code:" << error;
         }
-        CloseHandle(hProcess);
+        if (!CloseHandle(hProcess)) {
+            // Failed to close handle
+            DWORD error = GetLastError();
+            qDebug() << "Failed to close process handle. Error code:" << error;
+        }
     }
     return path;
 }
@@ -53,22 +67,20 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     auto handles = reinterpret_cast<v_window*>(lParam);
     if (handles->checkInv || IsWindowVisible(hwnd)) {
-            std::vector<char> buffer(GetWindowTextLengthA(hwnd) + 1);
-            GetWindowTextA(hwnd, buffer.data(), buffer.size());
-            if(buffer.data()) {
-                auto s = std::string(GetExecutablePathFromWindowHandle(hwnd));
-                if(s.find(handles->exe) != std::string::npos) {
-                    if(buffer.data() == handles->checkTitel)
-                        handles->count += 1;
-//                    qDebug() << buffer.data() << " = " << handles->checkTitel;
-
-                    handles->window = hwnd;
-                    handles->path = s;
-                    handles->titel = buffer.data();
-                } else {
-
-                }
+        std::vector<char> buffer(GetWindowTextLengthA(hwnd) + 1);
+        if(! GetWindowTextA(hwnd, buffer.data(), buffer.size())) {
+            return true;
+        }
+        if(buffer.data()) {
+            auto s = std::string(GetExecutablePathFromWindowHandle(hwnd));
+            if(s.find(handles->exe) != std::string::npos) {
+                if(buffer.data() == handles->checkTitel)
+                    handles->count += 1;
+                handles->window = hwnd;
+                handles->path = s;
+                handles->titel = buffer.data();
             }
+        }
 
     }
     return true;
@@ -101,7 +113,11 @@ void SpotifyManager::stopThread()
 bool SpotifyManager::alreadyRunningServiceAvaible()
 {
     v_window vw(nullptr, QFileInfo(QApplication::applicationFilePath()).fileName().toStdString(), "", "", true, "SpotifyEnhancer");
-    EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw));
+    if (!EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw))) {
+        // Failed to enumerate windows
+        DWORD error = GetLastError();
+        qDebug() << "Failed to enumerate windows. Error code:" << error;
+    }
     return vw.count;
 }
 
@@ -168,6 +184,8 @@ void SpotifyManager::setMs_checkrate(int newMs_checkrate)
 
 void SpotifyManager::run()
 {
+    sleep(2);
+
     std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
     int loop_count = 0;
     bool closed = false;
@@ -176,7 +194,11 @@ void SpotifyManager::run()
         closed = false;
         v_window vw(nullptr, "Spotify.exe", "", "");
 
-        EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw));
+        if (!EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw))) {
+            // Failed to enumerate windows
+            DWORD error = GetLastError();
+            qDebug() << "Failed to enumerate windows. Error code:" << error;
+        }
         if( vw.titel == "" ) {
 //            std::cout << "SPOTIFY NOT STARTED...waiting" << std::endl;
             sleep(10);
@@ -198,7 +220,26 @@ void SpotifyManager::run()
 
             //get titel
             std::vector<char> buffer(GetWindowTextLengthA(vw.window) + 1);
-            GetWindowTextA(vw.window, buffer.data(), buffer.size());
+            int windowTextLength = GetWindowTextLengthA(vw.window);
+            if (windowTextLength > 0) {
+                if (GetWindowTextA(vw.window, buffer.data(), buffer.size()) <= 0) {
+                    // Failed to get window text
+                    DWORD error = GetLastError();
+                    qDebug() << "Failed to get window text. Error code:" << error;
+                }
+            } else if (windowTextLength == 0) {
+                // Window has no text
+                qDebug() << "Window has no text.";
+                emit stopedSpot();
+                return;
+            } else {
+                // Failed to get window text length
+                DWORD error = GetLastError();
+                qDebug() << "Failed to get window text length. Error code:" << error;
+                emit stopedSpot();
+                return;
+            }
+
             if(buffer.empty() || !buffer.data()) {
                 emit stopedSpot();
                 return;
@@ -313,6 +354,7 @@ bool SpotifyManager::startSpotify()
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
     if (!CreateProcessA(NULL, const_cast<char*>(exePath.toStdString().c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+        qDebug() << "CreateProcessA failed: " << GetLastError();
         return false;
 
     // Wait for the program to start
@@ -322,9 +364,17 @@ bool SpotifyManager::startSpotify()
 
 bool SpotifyManager::searchSpotifyWindow(v_window *vw, int trys)
 {
-    EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(vw));
+    if (!EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw))) {
+        // Failed to enumerate windows
+        DWORD error = GetLastError();
+        qDebug() << "Failed to enumerate windows. Error code:" << error;
+    }
     for(int i = 0; i < trys && vw->titel == ""; i++) {
-        EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(vw));
+        if (!EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw))) {
+            // Failed to enumerate windows
+            DWORD error = GetLastError();
+            qDebug() << "Failed to enumerate windows. Error code:" << error;
+        }
         if(i == trys - 1) {
             break;
         }

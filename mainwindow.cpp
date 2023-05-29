@@ -163,8 +163,20 @@ bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr *)
         if (msg->lParam == WM_RBUTTONUP || msg->lParam == WM_LBUTTONUP )
         {
             POINT cursorPos;
-            GetCursorPos(&cursorPos);
-            SetForegroundWindow((HWND)winId());
+            if (!GetCursorPos(&cursorPos))
+            {
+                // Failed to get cursor position
+                DWORD error = GetLastError();
+                qDebug() << "Failed to get cursor position. Error code:" << error;
+            }
+
+            HWND windowHandle = (HWND)winId();
+            if (!SetForegroundWindow(windowHandle))
+            {
+                // Failed to set foreground window
+                DWORD error = GetLastError();
+                qDebug() << "Failed to set foreground window. Error code:" << error;
+            }
             trayMenu->exec(QPoint(cursorPos.x, cursorPos.y));
         }
     }
