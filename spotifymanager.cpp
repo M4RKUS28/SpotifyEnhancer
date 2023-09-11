@@ -148,12 +148,18 @@ void SpotifyManager::stop()
 
 void SpotifyManager::loadExePath()
 {
+
     exePath = QSettings("SpotifyEnhancer", "SpotifyEnhancer").value("exePath", QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "\\Spotify\\Spotify.exe").toString();
+
+
 }
 
 void SpotifyManager::setExePath(QString newPath)
 {
+
     QSettings("SpotifyEnhancer", "SpotifyEnhancer").setValue("exePath", (exePath = newPath));
+
+
 }
 
 QString SpotifyManager::getExePath()
@@ -163,7 +169,9 @@ QString SpotifyManager::getExePath()
 
 int SpotifyManager::getGesammtAnzahl()
 {
+
     return QSettings("SpotifyEnhancer", "SpotifyEnhancer").value("gesammtAnzahlUebersprungeneWerbungen", 0).toInt();
+
 }
 
 int SpotifyManager::load_and_getMs_checkrate()
@@ -353,10 +361,10 @@ bool SpotifyManager::startSpotify()
     si.cb = sizeof(si);
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
-    if (!CreateProcessA(NULL, const_cast<char*>(exePath.toStdString().c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+    if (!CreateProcessA(NULL, const_cast<char*>(exePath.toStdString().c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))  {
         qDebug() << "CreateProcessA failed: " << GetLastError();
         return false;
-
+    }
     // Wait for the program to start
     WaitForInputIdle(pi.hProcess, INFINITE);
     return true;
@@ -364,13 +372,13 @@ bool SpotifyManager::startSpotify()
 
 bool SpotifyManager::searchSpotifyWindow(v_window *vw, int trys)
 {
-    if (!EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw))) {
+    if (!EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(vw))) {
         // Failed to enumerate windows
         DWORD error = GetLastError();
         qDebug() << "Failed to enumerate windows. Error code:" << error;
     }
     for(int i = 0; i < trys && vw->titel == ""; i++) {
-        if (!EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw))) {
+        if (!EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(vw))) {
             // Failed to enumerate windows
             DWORD error = GetLastError();
             qDebug() << "Failed to enumerate windows. Error code:" << error;
