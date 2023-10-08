@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     nid.uID = 1;
     nid.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE;
     nid.uCallbackMessage = WM_TRAYICON;
-    nid.hIcon = LoadIconW(NULL, IDI_APPLICATION);
+//    nid.hIcon = LoadIconW(NULL, IDI_APPLICATION);
     nid.hIcon = (HICON) LoadImageA( // returns a HANDLE so we have to cast to HICON
         NULL,             // hInstance must be NULL when loading from a file
         "spotify-32.ico",   // the icon file name
@@ -142,6 +142,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         QMessageBox msgBox(QMessageBox::Question, "Bestätigung", "Was möchten Sie tun?", QMessageBox::NoButton, this);
         QPushButton* hideButton = msgBox.addButton("Fenster verstecken", QMessageBox::ActionRole);
         QPushButton* exitButton = msgBox.addButton("Programm beenden", QMessageBox::RejectRole);
+        msgBox.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
         msgBox.exec();
 
         if (msgBox.clickedButton() == hideButton)
@@ -233,7 +234,11 @@ void MainWindow::startSpotSlot()
         v_window v(nullptr, "Spotify.exe", "", "");
         if( spotmngr->searchSpotifyWindow(&v, 5) ) {
             spotmngr->sendPlaySignal(v);
+        }  else {
+            qDebug() << "sendPlaySignal failed";
         }
+    } else {
+        qDebug() << "startSpotify failed";
     }
 
 }
@@ -245,7 +250,12 @@ void MainWindow::stopSpotSlot()
 {
     v_window v(nullptr, "Spotify.exe", "", "");
     if( spotmngr->searchSpotifyWindow(&v, 1) ) {
-        spotmngr->stopSpotify(v);
+        if( ! spotmngr->stopSpotify(v) ) {
+            qDebug() << "stopSpotify failed";
+
+        }
+    } else {
+        qDebug() << "searchSpotifyWindow failed";
     }
 }
 
