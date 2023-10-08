@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "ueberdialog.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
@@ -128,6 +129,10 @@ MainWindow::MainWindow(QWidget *parent)
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     ui->actionAutostart->setChecked( settings.contains("SpotifyEnhancer") );
     ui->label_exepath->setText( spotmngr->getExePath() );
+
+
+    updater = new Updater(QApplication::applicationDirPath() + "../SpotifyEnhancerMaintanaceTool.exe", "M4RKUS", "SpotifyEnhancer");
+
 
 }
 
@@ -389,6 +394,13 @@ void MainWindow::on_actionGesammtzahl_Werbungen_triggered()
 
 void MainWindow::on_action_ber_triggered()
 {
-    QMessageBox::information(this, "Über", "M4RKUS!\nVersion: " + this->version );
+    UeberDialog (updater, this->version, this ).exec();
+}
+
+
+void MainWindow::on_actionAutomatisch_nach_Updates_suchen_triggered()
+{
+    updater->setAutoSearchForUpdate(ui->actionAutomatisch_nach_Updates_suchen->isChecked());
+    ui->actionAutomatisch_nach_Updates_suchen->setChecked(updater->getAutoSearchForUpdateStatus());
 }
 
