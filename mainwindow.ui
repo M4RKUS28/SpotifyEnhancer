@@ -213,6 +213,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgb
     </property>
     <addaction name="actionSpotify_Pfad_setzen"/>
     <addaction name="actionAutostart"/>
+    <addaction name="actionAutomatisch_nach_Updates_suchen"/>
    </widget>
    <widget class="QMenu" name="menuInfo">
     <property name="title">
@@ -245,6 +246,17 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgb
   <action name="actionGesammtzahl_Werbungen">
    <property name="text">
     <string>Gesamtzahl Werbungen</string>
+   </property>
+  </action>
+  <action name="actionAutomatisch_nach_Updates_suchen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Automatisch nach Updates suchen</string>
    </property>
   </action>
  </widget>

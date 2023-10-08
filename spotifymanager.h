@@ -5,6 +5,7 @@
 #include <QThread>
 #include <windows.h>
 
+
 struct v_window;
 
 

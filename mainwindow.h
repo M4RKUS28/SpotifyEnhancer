@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include "spotifymanager.h"
+#include "updater.h"
+#include "ui_mainwindow.h"
+
 #include <QMainWindow>
 #include <windows.h>
 
@@ -41,6 +44,7 @@ public:
 void closeEvent(QCloseEvent* event) override;
 
     SpotifyManager * spotmngr;
+    Updater * updater;
 
 private slots:
     void on_actionSpotify_Pfad_setzen_triggered();
@@ -89,6 +93,7 @@ private slots:
     void on_spinBox_ms_checkrate_valueChanged(int arg1);
     void on_actionGesammtzahl_Werbungen_triggered();
     void on_action_ber_triggered();
+    void on_actionAutomatisch_nach_Updates_suchen_triggered();
 };
 
 
