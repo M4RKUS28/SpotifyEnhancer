@@ -63,3 +63,5 @@ Fraktalgenerator_resource.rc
 debug/
 release/
 release*/
+
+installer/*.exe
