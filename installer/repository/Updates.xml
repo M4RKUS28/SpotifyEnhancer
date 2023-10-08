@@ -1,0 +1,27 @@
+<Updates>
+ <ApplicationName>{AnyApplication}</ApplicationName>
+ <ApplicationVersion>1.0.0</ApplicationVersion>
+ <Checksum>true</Checksum>
+ <PackageUpdate>
+  <Name>de.spotifyenhancer.main</Name>
+  <DisplayName>SpotifyEnhancer</DisplayName>
+  <Description>Install SpotifyEnhancer 1.4.0, a programm to automatically restart Spotify when advertisement is played.</Description>
+  <Version>1.4.0</Version>
+  <Default>true</Default>
+  <ReleaseDate>2023-10-08</ReleaseDate>
+  <Script>installscript.qs</Script>
+  <UpdateFile CompressedSize="15927237" UncompressedSize="53307480" OS="Any"/>
+  <DownloadableArchives>generic.7z,iconengines.7z,imageformats.7z,networkinformation.7z,platforms.7z,styles.7z,tls.7z,content.7z</DownloadableArchives>
+  <Licenses>
+   <License file="license.txt" name="GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"/>
+  </Licenses>
+  <Operations>
+   <Operation name="Extract">
+    <Argument>@TargetDir@/bin/</Argument>
+   </Operation>
+  </Operations>
+  <SHA1>3f7cf3ed4f78dcedc44d6207d5aa8a6d47eca363</SHA1>
+ </PackageUpdate>
+ <SHA1>474e62b7c62e40ae80a6bbed4e6cb5eeee37bff2</SHA1>
+ <MetadataName>2023-10-09-0050_meta.7z</MetadataName>
+</Updates>
