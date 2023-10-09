@@ -111,6 +111,10 @@ bool Updater::startUpdate()
 void Updater::updateDialogButtonClicked(QAbstractButton *button)
 {
     QMessageBox::ButtonRole role = updateMsgBox->buttonRole(button);
+    disconnect(updateMsgBox, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(updateDialogButtonClicked(QAbstractButton*)));
+    updateMsgBox->deleteLater();
+    updateMsgBox = nullptr;
+
     zustandWechseln("updateDialogButtonClicked()", (role == QMessageBox::AcceptRole) ? "AcceptRole" : "<Declined>");
 }
 
@@ -187,7 +191,7 @@ bool Updater::zustandWechseln(QString action, QString value)
                     if(start != -1) {
                         int ende = output.indexOf("\"", start + 10);
 
-                        newVersion = output.mid(start + 10, ende - start - 10);
+                        newVersion = "SpotifyEnhancer-" + output.mid(start + 10, ende - start - 10);
                         qDebug() << newVersion;
                     }
 
@@ -218,7 +222,7 @@ bool Updater::zustandWechseln(QString action, QString value)
 
         if(action == "showUpdateMessageBox()") {
             if( !updateMsgBox) {
-                updateMsgBox = new QMessageBox(QMessageBox::Information, "Update Available", "Es ist eine neuere Version verfügbar: " + newVersion + "\nBitte aktualiseren sie die Anwendung!");
+                updateMsgBox = new QMessageBox(QMessageBox::Information, "Update Available", "Es ist eine neuere Version für SpotifyEnhancer verfügbar: " + newVersion + "\nBitte aktualiseren sie die Anwendung!");
                                updateMsgBox->addButton("Jetzt aktualisieren", QMessageBox::AcceptRole);
                 updateMsgBox->addButton("Später aktualisieren", QMessageBox::RejectRole);
                     updateMsgBox->show();
@@ -227,20 +231,12 @@ bool Updater::zustandWechseln(QString action, QString value)
             }
         } else if(action == "updateDialogButtonClicked()") {
             if(value == "AcceptRole") {
-                this->status = UPDATE_STATUS::UPDATING;
                 error =  "Start Maintanance Tool for Update...";
                 startUpdate();
             } else {
                 error = "No Error";
                 this->status = UPDATE_STATUS::UPDTAE_NEEDED;
             }
-            if(updateMsgBox) {
-                delete updateMsgBox;
-                updateMsgBox = nullptr;
-            }
-
-            emit statusChanged();
-
 
         } else if(action == "startUpdate()") {
 #ifndef Q_OS_WEB

@@ -131,8 +131,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_exepath->setText( spotmngr->getExePath() );
 
 
-    updater = new Updater(QApplication::applicationDirPath() + "../SpotifyEnhancerMaintanaceTool.exe", "M4RKUS", "SpotifyEnhancer");
-
+    updater = new Updater(/*QApplication::applicationDirPath() */ "C:\\Program Files\\SpotifyEnhancer\\bin"  "/../SpotifyEnhancerMaintenanceTool.exe", "M4RKUS", "SpotifyEnhancer");
+    ui->actionAutomatisch_nach_Updates_suchen->setChecked(updater->getAutoSearchForUpdateStatus());
 
 }
 
@@ -145,8 +145,10 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
     {
         QMessageBox msgBox(QMessageBox::Question, "Bestätigung", "Was möchten Sie tun?", QMessageBox::NoButton, this);
+        QPushButton* aboardButton = msgBox.addButton("Abbrechen", QMessageBox::ActionRole);
         QPushButton* hideButton = msgBox.addButton("Fenster verstecken", QMessageBox::ActionRole);
         QPushButton* exitButton = msgBox.addButton("Programm beenden", QMessageBox::RejectRole);
+
         msgBox.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
         msgBox.exec();
 
@@ -158,6 +160,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
         else if (msgBox.clickedButton() == exitButton)
         {
             event->accept();  // Das Programm beenden
+        } else if(msgBox.clickedButton() ==  aboardButton)
+        {
+            event->ignore();  // Das Schließen des Fensters ignorieren
+            return;
         }
     }
 

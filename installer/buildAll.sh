@@ -1,10 +1,5 @@
 #!/bin/bash
 
-echo "Delete old exe File..."
-rm ./packages/de.spotifyenhancer.main/data/SpotifyEnhancer.exe
-
-echo "Copying new exe File..."
-cp ../release/SpotifyEnhancer.exe ./packages/de.spotifyenhancer.main/data/SpotifyEnhancer.exe
 
 # Start program 1 in the background
 echo "Starting creating online installer..."
@@ -26,7 +21,6 @@ fi
 # Wait for program 1 and program 2 to finish
 wait
 
-
 #update git repo...
 echo "Updating git repo..."
 
@@ -42,11 +36,10 @@ echo "	>>	git push"
 sleep 1
 git push
 
-# Prompt the user to press Enter
-read -p "Press Enter to close the terminal"
 
 # Continue with the rest of your script after program 1 and program 2 have finished
 echo "Finished!"
+
 
 # Prompt the user to press Enter
 read -p "Press Enter to close the terminal"
