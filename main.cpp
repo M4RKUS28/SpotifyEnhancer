@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
+    a.setQuitOnLastWindowClosed(false); // Fix bug when shown updater window
 
 //    a.setStyle("fusion"); // looks good with dark color scheme
 //    //Customize color palette for dark mode

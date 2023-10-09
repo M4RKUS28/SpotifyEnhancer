@@ -41,7 +41,7 @@ void UeberDialog::updaterStatusChanged()
         ui->pushButtonUpdaterButton->show();
         break;
     case Updater::UP_TO_DATE:
-        ui->labelUpdateStatus->setText("Sie verwenden die neuste Version! Erneut nach Updates suchen?");
+        ui->labelUpdateStatus->setText("Sie verwenden die neuste Version!");
         ui->pushButtonUpdaterButton->show();
         break;
     case Updater::UPDATING: {
