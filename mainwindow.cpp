@@ -17,7 +17,6 @@
 
 
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -29,8 +28,12 @@ MainWindow::MainWindow(QWidget *parent)
     spotmngr = new SpotifyManager();
     this->ui->spinBox_ms_checkrate->setValue( spotmngr->load_and_getMs_checkrate() );
 
-    if( spotmngr->alreadyRunningServiceAvaible() ) {
-        qDebug() << "Already running service";
+//    std::cout << "this: " << this->winId() << std::endl;
+
+    SpotifyManager::WindowHandle wh;
+    if( (wh = spotmngr->alreadyRunningServiceAvaible()) ) {
+        qDebug() << "Already running service -> try to make it visible...";
+        qDebug() << "Showing hidden service... " <<  (spotmngr->showHiddenService(wh) ? "Success" : "Failed");
         exit(0);
     }
 
@@ -45,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     trayMenu->addSeparator();
     acstatus = trayMenu->addAction("Werbung entfernen");
     acstatus->setCheckable(true);
+    acstatus->setChecked(true);
     trayMenu->addSeparator();
 
     startSpot = trayMenu->addAction("Spotify starten");
@@ -115,7 +119,6 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Shell_NotifyIcon failed with error: " << error;
     }
 
-
     connect(spotmngr, SIGNAL(updateReq()), this, SLOT(updateCounts()));
     connect(spotmngr, SIGNAL(stopedSpot()), this, SLOT(showThis()));
 
@@ -124,63 +127,105 @@ MainWindow::MainWindow(QWidget *parent)
 //    connect(this, &MainWindow::customContextMenuRequested, this, &MainWindow::showContextMenu);
 //    connect(this, &MainWindow::mousePressEvent, this, &MainWindow::onTrayIconClicked);
 
-    on_pushButton_clicked();
+    on_radioButtonStstaus_clicked(ui->radioButtonStstaus->isChecked());
 
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     ui->actionAutostart->setChecked( settings.contains("SpotifyEnhancer") );
+    //update exe path if changed!
+    on_actionAutostart_triggered(ui->actionAutostart->isChecked());
     ui->label_exepath->setText( spotmngr->getExePath() );
 
 
-    updater = new Updater(/*QApplication::applicationDirPath() */ "C:\\Program Files\\SpotifyEnhancer\\bin"  "/../SpotifyEnhancerMaintenanceTool.exe", "M4RKUS", "SpotifyEnhancer");
-    ui->actionAutomatisch_nach_Updates_suchen->setChecked(updater->getAutoSearchForUpdateStatus());
+    dialogUeber = new DialogUeber(/*QApplication::applicationDirPath() */ "C:\\Program Files\\SpotifyEnhancer\\bin"  "/../SpotifyEnhancerMaintenanceTool.exe",
+                                  "M4RKUS", "SpotifyEnhancer", this->version, QColor::fromRgb(0, 171, 255), this);
+    dialogUeber->setPixmap(QPixmap::fromImage(QImage(":/spotify-32.ico")));
+    dialogUeber->setDescription("https://code.obermui.de/markus/SpotifyEnhancer", QFile(":/description.txt"), "code.obermui.de/markus/SpotifyEnhancer");
+    dialogUeber->setLicence(QFile(":/LICENSE.txt"));
+    dialogUeber->setIssueWebsite("https://code.obermui.de/markus/SpotifyEnhancer/issues");
+
+    ui->actionAutomatisch_nach_Updates_suchen->setChecked(dialogUeber->updater()->getAutoSearchForUpdateStatus());
+
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 MainWindow::~MainWindow()
 {
     delete spotmngr;
+    delete dialogUeber;
     delete ui;
 }
 
+
 void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QMessageBox msgBox(QMessageBox::Question, "Bestätigung", "Was möchten Sie tun?", QMessageBox::NoButton, this);
+    QPushButton* aboardButton = msgBox.addButton("Abbrechen", QMessageBox::ActionRole);
+    QPushButton* hideButton = msgBox.addButton("Fenster verstecken", QMessageBox::ActionRole);
+    QPushButton* exitButton = msgBox.addButton("Programm beenden", QMessageBox::RejectRole);
+
+    msgBox.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == hideButton)
     {
-        QMessageBox msgBox(QMessageBox::Question, "Bestätigung", "Was möchten Sie tun?", QMessageBox::NoButton, this);
-        QPushButton* aboardButton = msgBox.addButton("Abbrechen", QMessageBox::ActionRole);
-        QPushButton* hideButton = msgBox.addButton("Fenster verstecken", QMessageBox::ActionRole);
-        QPushButton* exitButton = msgBox.addButton("Programm beenden", QMessageBox::RejectRole);
-
-        msgBox.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
-        msgBox.exec();
-
-        if (msgBox.clickedButton() == hideButton)
-        {
-            event->ignore();  // Das Schließen des Fensters ignorieren
-            hide();          // Das Fenster verstecken
-        }
-        else if (msgBox.clickedButton() == exitButton)
-        {
-            event->accept();  // Das Programm beenden
-        } else if(msgBox.clickedButton() ==  aboardButton)
-        {
-            event->ignore();  // Das Schließen des Fensters ignorieren
-            return;
-        }
+        event->ignore();  // Das Schließen des Fensters ignorieren
+        hide();          // Das Fenster verstecken
     }
+    else if (msgBox.clickedButton() == exitButton)
+    {
+        event->accept();  // Das Programm beenden
+    } else if(msgBox.clickedButton() ==  aboardButton)
+    {
+        event->ignore();  // Das Schließen des Fensters ignorieren
+        return;
+    }
+}
 
-bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr *)
+
+
+
+
+
+
+bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr * result)
 {
     MSG* msg = static_cast<MSG*>(message);
     if (msg->message == WM_TRAYICON)
     {
         if (msg->lParam == WM_RBUTTONUP || msg->lParam == WM_LBUTTONUP )
         {
-            POINT cursorPos;
-            if (!GetCursorPos(&cursorPos))
-            {
-                // Failed to get cursor position
-                DWORD error = GetLastError();
-                qDebug() << "Failed to get cursor position. Error code:" << error;
-            }
+//            POINT cursorPos;
+//            if (!GetCursorPos(&cursorPos))
+//            {
+//                // Failed to get cursor position
+//                DWORD error = GetLastError();
+//                qDebug() << "Failed to get cursor position. Error code:" << error;
+//            }
 
             HWND windowHandle = (HWND)winId();
             if (!SetForegroundWindow(windowHandle))
@@ -189,9 +234,23 @@ bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr *)
                 DWORD error = GetLastError();
                 qDebug() << "Failed to set foreground window. Error code:" << error;
             }
-            trayMenu->exec(QPoint(cursorPos.x, cursorPos.y));
+            trayMenu->exec(/*QPoint(cursorPos.x, cursorPos.y)*/QCursor::pos());
         }
     }
+
+    if (msg->message == WM_USER + 2) {
+        qDebug() << "Custom message received!";
+
+        if (msg->lParam == 187)
+        {
+            qDebug() << "Recieved Signal 'SHOW'";
+            *result = 187; // Set the result
+            this->show();
+            return true; // Indicate that the message was handled
+        }
+
+    }
+
     return false;
 }
 
@@ -236,7 +295,8 @@ void MainWindow::onOption2Clicked()
 
 void MainWindow::acstatusclicked()
 {
-    on_pushButton_clicked();
+    qDebug() << this->acstatus->isChecked();
+    on_radioButtonStstaus_clicked(this->acstatus->isChecked());
 }
 
 void MainWindow::startSpotSlot()
@@ -286,25 +346,6 @@ void MainWindow::on_actionSpotify_Pfad_setzen_triggered()
 }
 
 
-void MainWindow::on_pushButton_clicked()
-{
-    this->ui->pushButton->setDisabled(true);
-    if(this->spotmngr->isRunning()) {
-        this->spotmngr->stopThread();
-        this->ui->pushButton->setText("Start");
-        this->acstatus->setChecked(false);
-
-    } else {
-        this->spotmngr->startThread();
-        this->ui->pushButton->setText("Stop");
-        std::cout << "STARTED" << std::endl;
-        this->acstatus->setChecked(true);
-
-    }
-
-    this->ui->pushButton->setDisabled(false);
-}
-
 
 void MainWindow::on_actionAutostart_triggered(bool checked)
 {
@@ -320,6 +361,7 @@ void MainWindow::on_actionAutostart_triggered(bool checked)
         if( ! settings.contains(programName)) {
             std::cout << "autostart setzten fehlgeschlagen!" << std::endl;
         }
+        std::cout << "autostart updated to "<< programPath.toStdString() << std::endl;
     } else {
         if( ! settings.isWritable()) {
             std::cout << "NICHT SCHREIBBAR!!!" << std::endl;
@@ -330,6 +372,8 @@ void MainWindow::on_actionAutostart_triggered(bool checked)
         }
 
     }
+
+
 }
 
 void MainWindow::updateCounts()
@@ -340,11 +384,11 @@ void MainWindow::updateCounts()
 void MainWindow::showThis()
 {
     if( ! this->spotmngr->isRunning()) {
-        this->ui->pushButton->setText("Start");
+        this->ui->radioButtonStstaus->setChecked(false);
         std::cout << "STOPED" << std::endl;
 
     } else {
-        this->ui->pushButton->setText("Stop");
+        this->ui->radioButtonStstaus->setChecked(true);
 
     }
 }
@@ -397,16 +441,28 @@ void MainWindow::on_actionGesammtzahl_Werbungen_triggered()
     QMessageBox::information(this, "Gesamtanzahl übersprungener Werbungen", "Insgesamt hast du bereits " + QString::number(ges) + " Werbungen übersprungen!\nDamit hast mehr als du dir mehr als " + formatiereSekunden(ges * 30) + " Werbung erspart!" );
 }
 
-
 void MainWindow::on_action_ber_triggered()
 {
-    UeberDialog (updater, this->version, this ).exec();
+    dialogUeber->exec();
 }
 
-
-void MainWindow::on_actionAutomatisch_nach_Updates_suchen_triggered()
+void MainWindow::on_radioButtonStstaus_clicked(bool status)
 {
-    updater->setAutoSearchForUpdate(ui->actionAutomatisch_nach_Updates_suchen->isChecked());
-    ui->actionAutomatisch_nach_Updates_suchen->setChecked(updater->getAutoSearchForUpdateStatus());
+    this->ui->radioButtonStstaus->setDisabled(true);
+    if(!status) {
+        if( this->spotmngr->isRunning() ) {
+            this->spotmngr->stopThread();
+            std::cout << "stoped" << std::endl;
+        }
+    } else {
+        if(! this->spotmngr->isRunning() ) {
+            this->spotmngr->startThread();
+            std::cout << "STARTED" << std::endl;
+        }
+    }
+    ui->radioButtonStstaus->setChecked(status);
+    this->acstatus->setChecked(status);
+
+    this->ui->radioButtonStstaus->setDisabled(false);
 }
 

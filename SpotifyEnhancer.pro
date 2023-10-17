@@ -37,3 +37,16 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     res.qrc
+
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../Bibliotheken/MUpdater/release/ -lMUpdater
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../Bibliotheken/MUpdater/debug/ -lMUpdater
+
+INCLUDEPATH += $$PWD/../../Bibliotheken/MUpdater
+DEPENDPATH += $$PWD/../../Bibliotheken/MUpdater
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Bibliotheken/MUpdater/release/libMUpdater.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Bibliotheken/MUpdater/debug/libMUpdater.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../Bibliotheken/MUpdater/release/MUpdater.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../Bibliotheken/MUpdater/debug/MUpdater.lib
