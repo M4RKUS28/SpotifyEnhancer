@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
+    <width>378</width>
     <height>187</height>
    </rect>
   </property>
@@ -38,7 +38,55 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgb
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="1" colspan="2">
+    <item row="2" column="0">
+     <widget class="QLabel" name="label">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(237, 243, 255);</string>
+      </property>
+      <property name="text">
+       <string>Test-Intervall: </string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_3">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(237, 243, 255);</string>
+      </property>
+      <property name="text">
+       <string>Übersprungene Werbungen:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="font">
+       <font>
+        <pointsize>11</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(237, 243, 255);</string>
+      </property>
+      <property name="text">
+       <string>Status:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="2">
      <widget class="QSpinBox" name="spinBox">
       <property name="font">
        <font>
@@ -60,115 +108,59 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgb
       </property>
      </widget>
     </item>
-    <item row="1" column="0" colspan="3">
-     <widget class="QPushButton" name="pushButton_2">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_4">
       <property name="font">
        <font>
-        <pointsize>13</pointsize>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Fenster verstecken</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0" colspan="3">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="0" column="0" colspan="3">
-     <widget class="QPushButton" name="pushButton">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>13</pointsize>
+        <pointsize>11</pointsize>
         <bold>true</bold>
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(84, 255, 249);</string>
+       <string notr="true">color: rgb(237, 243, 255);</string>
       </property>
       <property name="text">
-       <string>START/STOP</string>
+       <string>Spotify Exe Path:</string>
       </property>
      </widget>
     </item>
     <item row="4" column="0" colspan="3">
-     <widget class="QLabel" name="label_exepath">
-      <property name="font">
-       <font>
-        <pointsize>9</pointsize>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(237, 243, 255);</string>
-      </property>
-      <property name="text">
-       <string>exepath</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Schließen</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_3">
-      <property name="font">
-       <font>
-        <pointsize>11</pointsize>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(237, 243, 255);</string>
-      </property>
-      <property name="text">
-       <string>Übersprungene Werbungen:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label">
-      <property name="font">
-       <font>
-        <pointsize>11</pointsize>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: rgb(237, 243, 255);</string>
-      </property>
-      <property name="text">
-       <string>Test-Intervall: </string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1" colspan="2">
+    <item row="2" column="1" colspan="2">
      <widget class="QSpinBox" name="spinBox_ms_checkrate">
       <property name="font">
        <font>
@@ -193,6 +185,61 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgb
       </property>
      </widget>
     </item>
+    <item row="3" column="1" colspan="2">
+     <widget class="QLineEdit" name="label_exepath">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" colspan="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="radioButtonStstaus">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>5</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QRadioButton::indicator {
+    width: 20px;
+    height: 20px;
+}
+
+QRadioButton::indicator::unchecked {
+    image: url(:/redc.png);
+}
+
+QRadioButton::indicator::checked {
+    image: url(:/greenc.png);
+}</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -200,8 +247,8 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgb
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>346</width>
-     <height>22</height>
+     <width>378</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -213,7 +260,6 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgb
     </property>
     <addaction name="actionSpotify_Pfad_setzen"/>
     <addaction name="actionAutostart"/>
-    <addaction name="actionAutomatisch_nach_Updates_suchen"/>
    </widget>
    <widget class="QMenu" name="menuInfo">
     <property name="title">

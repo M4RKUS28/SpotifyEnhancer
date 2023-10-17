@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QStyleFactory>
+
 
 int main(int argc, char *argv[])
 {
@@ -24,8 +26,11 @@ int main(int argc, char *argv[])
 
 //    // Setzen Sie die Dark Palette für Ihre Anwendung
 //    QApplication::setPalette(darkPalette);
+    QStyleFactory fac;
+    a.setStyle( fac.create("Fusion"));
 
     MainWindow w;
 //    w.show();
     return a.exec();
 }
+

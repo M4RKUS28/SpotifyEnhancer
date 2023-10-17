@@ -1,14 +1,17 @@
+#ifdef a
+
 #include "ueberdialog.h"
 #include "ui_ueberdialog.h"
 
 #include <QTime>
 
-UeberDialog::UeberDialog(Updater *updater, QString version, QWidget *parent) :
+UeberDialog::UeberDialog(Updater *updater, QString version, QPixmap ico, QWidget *parent) :
     QDialog(parent), ui(new Ui::UeberDialog),
     updater(updater)
 {
     ui->setupUi(this);
     if(!updater) return;
+    this->ui->label_icon->setPixmap(ico);
 
     this->ui->labelUpdateStatus->setText(updater->getStatusStr());
 
@@ -20,6 +23,7 @@ UeberDialog::UeberDialog(Updater *updater, QString version, QWidget *parent) :
     updater->setAutoShowMessageBox(false);
     updaterStatusChanged();
     connect(updater, SIGNAL(statusChanged()), this, SLOT(updaterStatusChanged()));
+
 }
 
 UeberDialog::~UeberDialog()
@@ -45,13 +49,13 @@ void UeberDialog::updaterStatusChanged()
         ui->pushButtonUpdaterButton->show();
         break;
     case Updater::UPDATING: {
-        ui->labelUpdateStatus->setText("Updater ausgeführt! Programm schließt sich in 3 Sekunden!");
+        ui->labelUpdateStatus->setText("Updater ausgeführt!");/* Programm schließt sich in 3 Sekunden!");
         this->delay();
         ui->labelUpdateStatus->setText("Updater ausgeführt! Programm schließt sich in 2 Sekunden!");
         this->delay();
         ui->labelUpdateStatus->setText("Updater ausgeführt! Programm schließt sich in 1 Sekunden!");
         this->delay(2);
-        QApplication::exit();
+        QApplication::exit();*/
         break;
         }
     default:
@@ -76,3 +80,10 @@ void UeberDialog::on_pushButtonUpdaterButton_clicked()
     }
 }
 
+
+void UeberDialog::on_pushButtonClose_clicked()
+{
+    this->done(0);
+}
+
+#endif

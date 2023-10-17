@@ -15,21 +15,12 @@
 #include <thread>
 #include <vector>
 #include <psapi.h>
+#include <iostream>
 
 
-struct v_window {
-    v_window() { }
-    v_window( HWND window, std::string exe, std::string titel, std::string path,  bool checkInv = false,  std::string checkTitel = "")
-        : window(window), titel(titel) , path(path), exe(exe), checkInv(checkInv), checkTitel(checkTitel), count(0)
-    { }
-    HWND window;
-    std::string titel;
-    std::string path;
-    std::string exe;
-    bool checkInv;
-    std::string checkTitel;
-    int count;
-};
+
+
+
 
 
 std::string GetExecutablePathFromWindowHandle(HWND hwnd)
@@ -74,9 +65,12 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
         if(buffer.data()) {
             auto s = std::string(GetExecutablePathFromWindowHandle(hwnd));
             if(s.find(handles->exe) != std::string::npos) {
-                if(buffer.data() == handles->checkTitel)
+                if(buffer.data() == handles->checkTitel) {
                     handles->count += 1;
+                    handles->last_name_fitted_test_hwnd = hwnd;
+                }
                 handles->window = hwnd;
+//                std::cout << hwnd << ": " << buffer.data() <<std::endl;
                 handles->path = s;
                 handles->titel = buffer.data();
             }
@@ -110,15 +104,24 @@ void SpotifyManager::stopThread()
     stop();
 }
 
-bool SpotifyManager::alreadyRunningServiceAvaible()
+SpotifyManager::WindowHandle SpotifyManager::alreadyRunningServiceAvaible()
 {
     v_window vw(nullptr, QFileInfo(QApplication::applicationFilePath()).fileName().toStdString(), "", "", true, "SpotifyEnhancer");
     if (!EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&vw))) {
-        // Failed to enumerate windows
-        DWORD error = GetLastError();
+        DWORD error = GetLastError();         // Failed to enumerate windows
         qDebug() << "Failed to enumerate windows. Error code:" << error;
+        return nullptr;
     }
-    return vw.count;
+    return vw.count > 0 ? vw.last_name_fitted_test_hwnd : nullptr;
+}
+
+bool SpotifyManager::showHiddenService(WindowHandle w)
+{
+    //Send signal to Show Window
+        // Using WM_USER + 1 in a SendMessage call means you're sending a custom message with an identifier of 1025.  This message will have no predefined meaning to Windows itself;
+        //it's up to the application receiving the message to interpret and handle it.
+
+    return w ? (SendMessage(w, WM_USER + 2, 0, (LPARAM)187) == 187) : false;
 }
 
 void SpotifyManager::stop()
