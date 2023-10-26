@@ -1,21 +1,32 @@
 #!/bin/bash
 
 
+qt_path=""
+installer_version="4.6"
+
+
+if [ -d "/C/Qt/" ]; then
+	qt_path="/C/Qt/"
+else
+	qt_path="/D/QtNeu/"
+fi
+echo "Qt Directory: $qt_path"
+
 # Start program 1 in the background
 echo "Starting creating online installer..."
-/D/QtNeu/Tools/QtInstallerFramework/4.6/bin/binarycreator.exe --online-only -c config/config.xml -p packages SpotifyEnhancerOnlineInstaller.exe &
+${qt_path}Tools/QtInstallerFramework/$installer_version/bin/binarycreator.exe --online-only -c config/config.xml -p packages SpotifyEnhancerOnlineInstaller.exe &
 
 # Start program 2 in the background
 echo "Starting creating offline installer..."
-/D/QtNeu/Tools/QtInstallerFramework/4.6/bin/binarycreator.exe --offline-only -c config/config.xml -p packages SpotifyEnhancerOfflineInstaller.exe &
+${qt_path}Tools/QtInstallerFramework/$installer_version/bin/binarycreator.exe --offline-only -c config/config.xml -p packages SpotifyEnhancerOfflineInstaller.exe &
 
 
 if [ -d "./repository" ]; then
 	echo "Staring updating repository...."
-	/D/QtNeu/Tools/QtInstallerFramework/4.6/bin/repogen.exe --update -p packages repository
+	${qt_path}Tools/QtInstallerFramework/$installer_version/bin/repogen.exe --update -p packages repository
 else
 	echo "Staring creating repository...."
-	/D/QtNeu/Tools/QtInstallerFramework/4.6/bin/repogen.exe -p packages repository
+	${qt_path}Tools/QtInstallerFramework/$installer_version/bin/repogen.exe -p packages repository
 fi
 
 # Wait for program 1 and program 2 to finish

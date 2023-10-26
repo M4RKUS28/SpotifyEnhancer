@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
     <DisplayName>SpotifyEnhancer</DisplayName>
-    <Description>Install SpotifyEnhancer 1.6.0, a programm to automatically restart Spotify when advertisement is played.</Description>
-    <Version>1.6.0</Version>
+    <Description>Install SpotifyEnhancer 1.6.1, a programm to automatically restart Spotify when advertisement is played.</Description>
+    <Version>1.6.1</Version>
     <Default>true</Default>
 
     <ReleaseDate>2023-10-17</ReleaseDate>

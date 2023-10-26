@@ -16,19 +16,14 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    spotifymanager.cpp \
-    ueberdialog.cpp \
-    updater.cpp
+    spotifymanager.cpp
 
 HEADERS += \
     mainwindow.h \
-    spotifymanager.h \
-    ueberdialog.h \
-    updater.h
+    spotifymanager.h
 
 FORMS += \
-    mainwindow.ui \
-    ueberdialog.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

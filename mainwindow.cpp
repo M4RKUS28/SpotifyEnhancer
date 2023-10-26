@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "ueberdialog.h"
 #include "ui_mainwindow.h"
 
 #include <QFileDialog>
@@ -15,6 +14,7 @@
 #include <QCloseEvent>
 #include <QPushButton>
 
+#include "stylehandler.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -46,21 +46,21 @@ MainWindow::MainWindow(QWidget *parent)
     actionOption1->setIcon(QIcon(":/maximize_icon.png"));
 
     trayMenu->addSeparator();
-    acstatus = trayMenu->addAction("Werbung entfernen");
+
+    acstatus = trayMenu->addAction("Werbung entfernen           ");
     acstatus->setCheckable(true);
     acstatus->setChecked(true);
     trayMenu->addSeparator();
 
-    startSpot = trayMenu->addAction("Spotify starten");
+    startSpot = trayMenu->addAction("Spotify starten            ");
     startSpot->setIcon(QIcon(":/spotify_original_green.png"));
     trayMenu->addSeparator();
 
-    stopSpot = trayMenu->addAction("Spotify beenden");
+    stopSpot = trayMenu->addAction("Spotify beenden             ");
     stopSpot->setIcon(QIcon(":/close_icon.png"));
     trayMenu->addSeparator();
 
-
-    actionOption2 = trayMenu->addAction("Programm beenden");
+    actionOption2 = trayMenu->addAction("Programm beenden           ");
     actionOption2->setIcon(QIcon(":/beenden.png"));
 
     connect(actionOption1, &QAction::triggered, this, &MainWindow::onOption1Clicked);
@@ -91,6 +91,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Set the tooltip text
     wcscpy_s(nid.szTip, ARRAYSIZE(nid.szTip), L"Spotify Enhancer");
+
+
 
 //    // Set the title (info balloon) text
 //    wcscpy_s(nid.szInfo, ARRAYSIZE(nid.szInfo), L"Spotify Enhancer");
@@ -136,8 +138,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_exepath->setText( spotmngr->getExePath() );
 
 
-    dialogUeber = new DialogUeber(/*QApplication::applicationDirPath() */ "C:\\Program Files\\SpotifyEnhancer\\bin"  "/../SpotifyEnhancerMaintenanceTool.exe",
-                                  "M4RKUS", "SpotifyEnhancer", this->version, QColor::fromRgb(0, 171, 255), this);
+
+    dialogUeber = new DialogUeber( ( (true) ? QApplication::applicationDirPath() : "C:\\Program Files\\SpotifyEnhancer\\bin" ) + "/../SpotifyEnhancerMaintenanceTool.exe",
+                                  "M4RKUS", "SpotifyEnhancer", this->version, QColor::fromRgb(0, 171, 255), this, true);
     dialogUeber->setPixmap(QPixmap::fromImage(QImage(":/spotify-32.ico")));
     dialogUeber->setDescription("https://code.obermui.de/markus/SpotifyEnhancer", QFile(":/description.txt"), "code.obermui.de/markus/SpotifyEnhancer");
     dialogUeber->setLicence(QFile(":/LICENSE.txt"));
@@ -145,8 +148,33 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->actionAutomatisch_nach_Updates_suchen->setChecked(dialogUeber->updater()->getAutoSearchForUpdateStatus());
 
+    styleHandler = new StyleHandler("M4RKUS", "SpotifyEnhancer");
+    ui->designl->addWidget(styleHandler->getCombobox());
 
+//    qApp->setStyleSheet("QWidget#widget{ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1,"
+//                        " stop:0 rgba(12, 169, 239, 100), stop:1 rgba(255, 255, 255, 0))\n}");
+
+//    // Create a linear gradient
+//    QLinearGradient gradient(0, 0, 300, 300);
+//    gradient.setColorAt(0, QColor(12, 169, 239, 100));
+//    gradient.setColorAt(1, QColor(255, 255, 255, 0));
+
+//    // Create a brush with the gradient
+//    QBrush brush(gradient);
+
+//    // Create a palette
+//    QPalette palette = ui->widget->palette();
+
+//    // Set the brush to the desired role
+//    palette.setBrush(QPalette::Window, brush);
+//    palette.setBrush(QPalette::Base, brush);
+//    palette.setBrush(QPalette::AlternateBase, brush);
+
+//    // Apply the modified palette to the widget
+//    ui->widget->setPalette(palette);
 }
+
+
 
 
 
@@ -376,10 +404,6 @@ void MainWindow::on_actionAutostart_triggered(bool checked)
 
 }
 
-void MainWindow::updateCounts()
-{
-    this->ui->spinBox->setValue( spotmngr->getCounts() );
-}
 
 void MainWindow::showThis()
 {
@@ -392,6 +416,10 @@ void MainWindow::showThis()
 
     }
 }
+
+
+
+
 
 
 void MainWindow::on_pushButton_2_clicked()
@@ -464,5 +492,18 @@ void MainWindow::on_radioButtonStstaus_clicked(bool status)
     this->acstatus->setChecked(status);
 
     this->ui->radioButtonStstaus->setDisabled(false);
+}
+
+#include <QApplication>
+void MainWindow::on_pushButtonExit_clicked()
+{
+    QApplication::quit();
+}
+
+
+
+void MainWindow::on_radioButtonStstaus_toggled(bool checked)
+{
+    ui->radioButtonStstaus->setText(checked ? " Aktiv " : "Inaktiv");
 }
 

@@ -3,6 +3,7 @@
 
 #include "spotifymanager.h"
 #include "dialogueber.h"
+#include "stylehandler.h"
 #include "ui_mainwindow.h"
 
 #include <QMainWindow>
@@ -36,7 +37,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    QString version = "1.6.0";
+    QString version = "1.6.1";
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -46,6 +47,7 @@ void closeEvent(QCloseEvent* event) override;
 
     SpotifyManager * spotmngr;
     DialogUeber * dialogUeber;
+    StyleHandler * styleHandler;
 
 private slots:
     void on_actionSpotify_Pfad_setzen_triggered();
@@ -75,7 +77,6 @@ private:
 
     // QObject interface
 private slots:
-    void updateCounts();
     void showThis();
 
     void onOption1Clicked();
@@ -92,6 +93,8 @@ private slots:
     void on_action_ber_triggered();
 
     void on_radioButtonStstaus_clicked(bool status);
+    void on_pushButtonExit_clicked();
+    void on_radioButtonStstaus_toggled(bool checked);
 };
 
 
