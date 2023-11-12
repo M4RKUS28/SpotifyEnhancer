@@ -2,8 +2,8 @@
  <ApplicationName>{AnyApplication}</ApplicationName>
  <ApplicationVersion>1.0.0</ApplicationVersion>
  <Checksum>true</Checksum>
- <SHA1>7256646e840a81fe41b49cd56147df666709e3ab</SHA1>
- <MetadataName>2023-11-12-0131_meta.7z</MetadataName>
+ <SHA1>4f46e031bb24481ff78daf44fded8ce0c1fe1a85</SHA1>
+ <MetadataName>2023-11-12-0137_meta.7z</MetadataName>
  <PackageUpdate>
   <Name>de.spotifyenhancer.main</Name>
   <DisplayName>SpotifyEnhancer</DisplayName>
@@ -12,7 +12,7 @@
   <Default>true</Default>
   <ReleaseDate>2023-11-10</ReleaseDate>
   <Script>installscript.qs</Script>
-  <UpdateFile UncompressedSize="71386465" CompressedSize="21213664" OS="Any"/>
+  <UpdateFile UncompressedSize="71386465" CompressedSize="21213660" OS="Any"/>
   <DownloadableArchives>generic.7z,iconengines.7z,imageformats.7z,networkinformation.7z,platforms.7z,styles.7z,tls.7z,translations.7z,content.7z</DownloadableArchives>
   <Licenses>
    <License file="license.txt" name="GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"/>
@@ -22,6 +22,6 @@
     <Argument>@TargetDir@/bin/</Argument>
    </Operation>
   </Operations>
-  <SHA1>95875214f337ae9d91b3d0069a1fcf85c0268823</SHA1>
+  <SHA1>41db6a7df6b0cd9dce6ee02a0cbe3ec95688cfe0</SHA1>
  </PackageUpdate>
 </Updates>
