@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QFileInfo>
+#include <QMessageBox>
 #include <QSettings>
 #include <QStandardPaths>
 
@@ -86,7 +87,9 @@ SpotifyManager::SpotifyManager()
 {
     this->loadExePath();
     this->counts = 0;
-    this->ms_checkrate = 2000;
+    this->ms_checkrate = 1000;
+    use_special_methode = false;
+    playDelay = 500;
 }
 
 SpotifyManager::~SpotifyManager()
@@ -151,18 +154,21 @@ void SpotifyManager::stop()
 
 void SpotifyManager::loadExePath()
 {
+    bool init = QSettings("SpotifyEnhancer", "SpotifyEnhancer").contains("exePath");
+    QString default_path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/../Spotify/Spotify.exe";
 
-    exePath = QSettings("SpotifyEnhancer", "SpotifyEnhancer").value("exePath", QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "\\Spotify\\Spotify.exe").toString();
-
-
+    exePath = QSettings("SpotifyEnhancer", "SpotifyEnhancer").value("exePath", default_path).toString();
+    if(!init && !QFile(default_path).exists()) {
+        QMessageBox::information(nullptr, "Spotify Pfad festlegen", "Um Spotify Enhancer verwenden zu können, müssen sie den Pfad zur Spotify Anwendung festlegen! (Unter Einstellungen -> Spotify Pfad setzen)"
+                                                                    "\n\nWichtig: Spotify muss über einen Installer in einem echten Ordner installiert sein "
+                                                                    "und nicht über den Microsoft Store!");
+    }
 }
 
 void SpotifyManager::setExePath(QString newPath)
 {
 
     QSettings("SpotifyEnhancer", "SpotifyEnhancer").setValue("exePath", (exePath = newPath));
-
-
 }
 
 QString SpotifyManager::getExePath()
@@ -270,7 +276,6 @@ void SpotifyManager::run()
                     emit updateReq();
                     QSettings("SpotifyEnhancer", "SpotifyEnhancer").setValue("gesammtAnzahlUebersprungeneWerbungen", this->getGesammtAnzahl() + 1);
 
-
                     //RESTARTING:::::::::
                     break;
 
@@ -292,9 +297,9 @@ void SpotifyManager::run()
 
         std::cout << "FOUND ADVERTISEMENT!!: " << vw.titel << " restarting..." << std::endl;
 
-        // Check if 30 sec  has elapsed
+        // Check if 60 sec  has elapsed
         std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() >= 30) {
+        if (std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count() >= 60) {
             // Calculate loops per minute
             double loops_per_minute = static_cast<double>(loop_count) / (static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count()) / 60000.0);
             // Check if there are more than 3 loops per minute
@@ -311,7 +316,7 @@ void SpotifyManager::run()
         // Close the Spotify window
         if( !stopSpotify(vw) )
             continue;
-        msleep(500);
+        msleep(50 + playDelay);
 
 
         // Start the program again;
@@ -319,14 +324,14 @@ void SpotifyManager::run()
             std::cerr << "Error starting program" << std::endl;
             continue;
         }
-        msleep(500);
+        msleep(50 + playDelay);
 
         // searchSpotifyWindow
         if( ! searchSpotifyWindow(&vw) ) {
             std::cerr << "Couldnd find spoitfy after restart" << std::endl;
             break;
         }
-        msleep(500);
+        msleep(100);
 
         if( !sendPlaySignal(vw) ) {
             std::cerr << "Couldnd start playing after restart" << std::endl;
@@ -335,7 +340,7 @@ void SpotifyManager::run()
         // Increment loop count
         loop_count++;
 
-        sleep(8);
+        sleep(10);
     }
 
 }
@@ -343,6 +348,10 @@ void SpotifyManager::run()
 
 bool SpotifyManager::stopSpotify(v_window w)
 {
+    // Get the process ID associated with the window
+    DWORD processId;
+    GetWindowThreadProcessId(w.window, &processId);
+
     // Close the Spotify window
     LRESULT result = SendMessageA(w.window, WM_CLOSE, 0, 0);
     if (result == 0) {
@@ -353,7 +362,60 @@ bool SpotifyManager::stopSpotify(v_window w)
             return false;
         }
     }
-    return true;
+
+    // Get a handle to the process
+    HANDLE hProcess = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_INFORMATION, FALSE, processId);
+    if (hProcess == NULL) {
+        // Handle error
+        DWORD error = GetLastError();
+        std::cerr << "OpenProcess failed with error:" << error << std::endl;
+        return false;
+    }
+
+    // Wait for the process to exit
+    DWORD waitResult = WaitForSingleObject(hProcess, INFINITE);
+    if (waitResult == WAIT_FAILED) {
+        // Handle error
+        DWORD error = GetLastError();
+        std::cerr << "WaitForSingleObject failed with error:" << error << std::endl;
+        CloseHandle(hProcess);
+        return false;
+    }
+
+    // Get the exit code of the process
+    DWORD exitCode;
+    if (!GetExitCodeProcess(hProcess, &exitCode)) {
+        // Handle error
+        DWORD error = GetLastError();
+        std::cerr << "GetExitCodeProcess failed with error:" << error << std::endl;
+        CloseHandle(hProcess);
+        return false;
+    }
+
+    // Close the process handle
+    if(!CloseHandle(hProcess)) {
+        std::cerr << "CloseHandle failed" << std::endl;
+    }
+
+    // Check if the process exited successfully
+    if (exitCode != STILL_ACTIVE) {
+        // Process has exited
+        return true;
+    } else {
+        // Process did not exit within the specified time
+        std::cerr << "WaitForSingleObject timed out" << std::endl;
+        return false;
+    }
+}
+
+void SpotifyManager::setPlayDelay(int newPlayDelay)
+{
+    playDelay = newPlayDelay;
+}
+
+void SpotifyManager::setUse_special_methode(bool newUse_special_methode)
+{
+    use_special_methode = newUse_special_methode;
 }
 
 bool SpotifyManager::startSpotify()
@@ -368,8 +430,10 @@ bool SpotifyManager::startSpotify()
         qDebug() << "CreateProcessA failed: " << GetLastError();
         return false;
     }
+    qDebug() << "Wait for the program to start";
     // Wait for the program to start
     WaitForInputIdle(pi.hProcess, INFINITE);
+    qDebug() << "started";
     return true;
 }
 
@@ -403,15 +467,31 @@ bool  SpotifyManager::sendPlaySignal(v_window new_win)
     HWND current_foreground_window = GetForegroundWindow();
 
     // Set the program window to the foreground
+    bool forgroundsetting_worked = true;
+    bool tried_sepcialthings = false;
+    DWORD dwCurrentThread = GetCurrentThreadId();
+    DWORD dwFGThread      = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
     if (!SetForegroundWindow(new_win.window))
     {
         qDebug() << "Fehler beim Festlegen des Fensters als Vordergrundfenster." << GetLastError();
-//        return false;
+        forgroundsetting_worked = false;
+
+        if(use_special_methode) {
+            tried_sepcialthings = true;
+
+            qDebug() << "try sonder methode";
+            if(!AttachThreadInput(dwCurrentThread, dwFGThread, TRUE)) {
+                qDebug() << "Special Methode: AttachThreadInput() failed";
+            } else if(SetForegroundWindow(new_win.window)) {
+                qDebug() << "In special Methode it worked";
+                forgroundsetting_worked = true;
+            }
+        }
     }
 
     // Wait for the window to become the foreground window
-    while(GetForegroundWindow() != new_win.window)
-        Sleep(100);
+    for(int i = 0; i < 40 && GetForegroundWindow() != new_win.window; i++)
+        msleep(100);
 
     // Send keyboard input to the program window -> start music again
     INPUT input[4];
@@ -425,11 +505,16 @@ bool  SpotifyManager::sendPlaySignal(v_window new_win)
     }
 
     // Restore the original foreground window
-    if (!SetForegroundWindow(current_foreground_window))
+    if (forgroundsetting_worked && !SetForegroundWindow(current_foreground_window))
     {
         qDebug() << "Fehler beim Wiederherstellen des ursprünglichen Vordergrundfensters.";
 //            return false;
     }
+
+    if(tried_sepcialthings)
+        if(!AttachThreadInput(dwCurrentThread, dwFGThread, FALSE)) {
+            qDebug() << "Special Methode - restore : AttachThreadInput() failed";
+        }
 
 
     auto ct = std::chrono::system_clock::now();

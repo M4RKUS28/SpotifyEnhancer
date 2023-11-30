@@ -17,6 +17,9 @@
 #include "stylehandler.h"
 
 
+
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -29,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->ui->spinBox_ms_checkrate->setValue( spotmngr->load_and_getMs_checkrate() );
 
 //    std::cout << "this: " << this->winId() << std::endl;
+
+
 
     SpotifyManager::WindowHandle wh;
     if( (wh = spotmngr->alreadyRunningServiceAvaible()) ) {
@@ -68,7 +73,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(acstatus, &QAction::triggered, this, &MainWindow::acstatusclicked);
     connect(startSpot, &QAction::triggered, this, &MainWindow::startSpotSlot);
     connect(stopSpot, &QAction::triggered, this, &MainWindow::stopSpotSlot);
-
 
     // Set up the NOTIFYICONDATA structure
     NOTIFYICONDATA nid;
@@ -121,9 +125,8 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Shell_NotifyIcon failed with error: " << error;
     }
 
-    connect(spotmngr, SIGNAL(updateReq()), this, SLOT(updateCounts()));
+//    connect(spotmngr, SIGNAL(updateReq()), this, SLOT(updateCounts()));
     connect(spotmngr, SIGNAL(stopedSpot()), this, SLOT(showThis()));
-
 
 //    // Handle the tray icon context menu
 //    connect(this, &MainWindow::customContextMenuRequested, this, &MainWindow::showContextMenu);
@@ -131,20 +134,21 @@ MainWindow::MainWindow(QWidget *parent)
 
     on_radioButtonStstaus_clicked(ui->radioButtonStstaus->isChecked());
 
+
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     ui->actionAutostart->setChecked( settings.contains("SpotifyEnhancer") );
     //update exe path if changed!
     on_actionAutostart_triggered(ui->actionAutostart->isChecked());
     ui->label_exepath->setText( spotmngr->getExePath() );
 
-
-
-    dialogUeber = new DialogUeber( ( (true) ? QApplication::applicationDirPath() : "C:\\Program Files\\SpotifyEnhancer\\bin" ) + "/../SpotifyEnhancerMaintenanceTool.exe",
+    dialogUeber = new DialogUeber( ( (false) ? QApplication::applicationDirPath() : "C:\\Program Files\\SpotifyEnhancer\\bin" ) + "/../SpotifyEnhancerMaintenanceTool.exe",
                                   "M4RKUS", "SpotifyEnhancer", this->version, QColor::fromRgb(0, 171, 255), this, true);
-    dialogUeber->setPixmap(QPixmap::fromImage(QImage(":/spotify-32.ico")));
+    dialogUeber->setPixmap(QPixmap::fromImage(QImage("://spot_ico_blue_x512.ico")).scaled(96, 96));
     dialogUeber->setDescription("https://code.obermui.de/markus/SpotifyEnhancer", QFile(":/description.txt"), "code.obermui.de/markus/SpotifyEnhancer");
     dialogUeber->setLicence(QFile(":/LICENSE.txt"));
     dialogUeber->setIssueWebsite("https://code.obermui.de/markus/SpotifyEnhancer/issues");
+
+
 
     ui->actionAutomatisch_nach_Updates_suchen->setChecked(dialogUeber->updater()->getAutoSearchForUpdateStatus());
 
@@ -172,32 +176,49 @@ MainWindow::MainWindow(QWidget *parent)
 
 //    // Apply the modified palette to the widget
 //    ui->widget->setPalette(palette);
+
+
+
+    QSettings s("M4RKUS", "SpotifyEnhancer");
+    bool val = s.value("special_methode", false).toBool();
+    spotmngr->setUse_special_methode(val);
+    ui->actionForceForeground->setChecked(val);
+
+    val = s.value("colored_background", true).toBool();
+    setColoredBackground(val);
+    ui->actionColored_Background->setChecked(val);
+
+    int i_val = s.value("playdelay", 500).toInt();
+    spotmngr->setPlayDelay(i_val);
+    ui->spinBoxPlayDelay->setValue(i_val);
+
+//    startTimer(3000);
 }
 
 
 
+void MainWindow::on_actionForceForeground_triggered()
+{
+    QSettings s("M4RKUS", "SpotifyEnhancer");
+    s.setValue("special_methode", ui->actionForceForeground->isChecked());
+    spotmngr->setUse_special_methode(ui->actionForceForeground->isChecked());
+}
+
+void MainWindow::on_actionColored_Background_triggered(bool checked)
+{
+    setColoredBackground(checked);
+    QSettings s("M4RKUS", "SpotifyEnhancer");
+    s.setValue("colored_background", checked);
+}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void MainWindow::on_spinBoxPlayDelay_valueChanged(int arg1)
+{
+    QSettings s("M4RKUS", "SpotifyEnhancer");
+    s.setValue("playdelay", arg1);
+    spotmngr->setPlayDelay(arg1);
+}
 
 
 
@@ -205,8 +226,24 @@ MainWindow::~MainWindow()
 {
     delete spotmngr;
     delete dialogUeber;
+    delete trayMenu;
     delete ui;
 }
+
+
+//void MainWindow::timerEvent(QTimerEvent *event)
+//{
+//    if( spotmngr->startSpotify() ) {
+//        v_window v(nullptr, "Spotify.exe", "", "");
+//        if( spotmngr->searchSpotifyWindow(&v, 5) ) {
+//            spotmngr->sendPlaySignal(v);
+//        }  else {
+//            qDebug() << "sendPlaySignal failed";
+//        }
+//    } else {
+//        qDebug() << "startSpotify failed";
+//    }
+//}
 
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -219,17 +256,29 @@ void MainWindow::closeEvent(QCloseEvent *event)
     msgBox.setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
     msgBox.exec();
 
+
     if (msgBox.clickedButton() == hideButton)
     {
+        QApplication::setQuitOnLastWindowClosed(true);
+
         event->ignore();  // Das Schließen des Fensters ignorieren
         hide();          // Das Fenster verstecken
+        qDebug() << "a1";
+        return;
     }
     else if (msgBox.clickedButton() == exitButton)
     {
         event->accept();  // Das Programm beenden
-    } else if(msgBox.clickedButton() ==  aboardButton)
+
+        QApplication::quit();
+
+        qDebug() << "a2";
+
+    } else if(msgBox.clickedButton() == aboardButton || msgBox.clickedButton() == nullptr)
     {
         event->ignore();  // Das Schließen des Fensters ignorieren
+        qDebug() << "a3";
+
         return;
     }
 }
@@ -266,6 +315,7 @@ bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr * result
         }
     }
 
+
     if (msg->message == WM_USER + 2) {
         qDebug() << "Custom message received!";
 
@@ -281,6 +331,8 @@ bool MainWindow::nativeEvent(const QByteArray &, void *message, qintptr * result
 
     return false;
 }
+
+
 
 //void MainWindow::showContextMenu(const QPoint &pos)
 //{
@@ -401,8 +453,34 @@ void MainWindow::on_actionAutostart_triggered(bool checked)
 
     }
 
-
 }
+
+void MainWindow::setColoredBackground(bool status)
+{
+    if(status) {
+        this->setStyleSheet("QWidget#MainWindow { \nbackground-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 rgba(0, 114, 255, 78), stop:1 rgba(96, 207, 212, 113));\n}");
+        this->ui->label->setStyleSheet("color: rgb(255, 255, 255);");
+        this->ui->label_2->setStyleSheet("color: rgb(255, 255, 255);");
+        this->ui->label_3->setStyleSheet("color: rgb(255, 255, 255);");
+        this->ui->label_4->setStyleSheet("color: rgb(255, 255, 255);");
+        this->ui->label_5->setStyleSheet("color: rgb(255, 255, 255);");
+        this->ui->radioButtonStstaus->setStyleSheet("QRadioButton{color: rgb(255, 255, 255);}\n QRadioButton::indicator {\n    width: 20px;\n    height: 20px;\n}\n\nQRadioButton::indicator::unchecked {\n    image: url(:/redc.png);\n}\n\nQRadioButton::indicator::checked {\n    image: url(:/greenc.png);\n}");
+
+
+    } else {
+        this->setStyleSheet("");
+        this->ui->label->setStyleSheet("");
+        this->ui->label_2->setStyleSheet("");
+        this->ui->label_3->setStyleSheet("");
+        this->ui->label_4->setStyleSheet("");
+        this->ui->label_5->setStyleSheet("");
+        this->ui->radioButtonStstaus->setStyleSheet("QRadioButton::indicator {\n    width: 20px;\n    height: 20px;\n}\n\nQRadioButton::indicator::unchecked {\n    image: url(:/redc.png);\n}\n\nQRadioButton::indicator::checked {\n    image: url(:/greenc.png);\n}");
+
+    }
+}
+
+
+
 
 
 void MainWindow::showThis()
@@ -474,6 +552,8 @@ void MainWindow::on_action_ber_triggered()
     dialogUeber->exec();
 }
 
+
+
 void MainWindow::on_radioButtonStstaus_clicked(bool status)
 {
     this->ui->radioButtonStstaus->setDisabled(true);
@@ -497,7 +577,10 @@ void MainWindow::on_radioButtonStstaus_clicked(bool status)
 #include <QApplication>
 void MainWindow::on_pushButtonExit_clicked()
 {
-    QApplication::quit();
+//    QCloseEvent *closeEvent = new QCloseEvent();
+//    //closeEvent->accept(); // You can set the accepted state as needed
+//    QApplication::sendEvent(this, closeEvent);
+    this->close();
 }
 
 
@@ -506,4 +589,6 @@ void MainWindow::on_radioButtonStstaus_toggled(bool checked)
 {
     ui->radioButtonStstaus->setText(checked ? " Aktiv " : "Inaktiv");
 }
+
+
 
