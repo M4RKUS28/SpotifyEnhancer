@@ -54,6 +54,8 @@ private:
 
     int counts;
     int ms_checkrate;
+    bool use_special_methode;
+    int playDelay;
 
     void stop();
     virtual void run();
@@ -67,6 +69,10 @@ public:
     void setMs_checkrate(int newMs_checkrate);
     int getCounts() const;
     int load_and_getMs_checkrate();
+
+    void setUse_special_methode(bool newUse_special_methode);
+
+    void setPlayDelay(int newPlayDelay);
 
 signals:
     void updateReq();

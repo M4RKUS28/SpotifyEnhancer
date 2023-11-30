@@ -9,5 +9,7 @@
         <file>description.txt</file>
         <file>greenc.png</file>
         <file>redc.png</file>
+        <file>spot_ico_blue_x512.ico</file>
+        <file>spot_ico.png</file>
     </qresource>
 </RCC>

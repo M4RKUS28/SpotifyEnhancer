@@ -37,13 +37,13 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    QString version = "1.6.1";
+    QString version = "1.7.6";
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-void closeEvent(QCloseEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
 
     SpotifyManager * spotmngr;
     DialogUeber * dialogUeber;
@@ -55,6 +55,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    void setColoredBackground(bool status);
 
     // System Tray
     QMenu* trayMenu;
@@ -95,7 +97,17 @@ private slots:
     void on_radioButtonStstaus_clicked(bool status);
     void on_pushButtonExit_clicked();
     void on_radioButtonStstaus_toggled(bool checked);
+
+    // QObject interface
+    void on_actionForceForeground_triggered();
+//protected:
+//     void timerEvent(QTimerEvent *event) override;
+
+    void on_actionColored_Background_triggered(bool checked);
+    void on_spinBoxPlayDelay_valueChanged(int arg1);
 };
+
+
 
 
 #endif // MAINWINDOW_H
