@@ -2,17 +2,17 @@
  <ApplicationName>{AnyApplication}</ApplicationName>
  <ApplicationVersion>1.0.0</ApplicationVersion>
  <Checksum>true</Checksum>
- <SHA1>45be22fb297343ea26b34cbf86ef8ef47a3c7570</SHA1>
- <MetadataName>2023-12-16-2110_meta.7z</MetadataName>
+ <SHA1>817dd56ed7c2fb96ee5dbffed6ba0be08d9fda63</SHA1>
+ <MetadataName>2023-12-16-2112_meta.7z</MetadataName>
  <PackageUpdate>
   <Name>de.spotifyenhancer.main</Name>
   <DisplayName>SpotifyEnhancer</DisplayName>
   <Description>Install SpotifyEnhancer 1.7.7, a programm to automatically restart Spotify when advertisement is played.</Description>
-  <Version>1.6.7</Version>
+  <Version>1.0.7</Version>
   <Default>true</Default>
   <ReleaseDate>2023-12-13</ReleaseDate>
   <Script>installscript.qs</Script>
-  <UpdateFile UncompressedSize="71394145" CompressedSize="21216149" OS="Any"/>
+  <UpdateFile OS="Any" UncompressedSize="71394145" CompressedSize="21216157"/>
   <DownloadableArchives>generic.7z,iconengines.7z,imageformats.7z,networkinformation.7z,platforms.7z,styles.7z,tls.7z,translations.7z,content.7z</DownloadableArchives>
   <Licenses>
    <License file="license.txt" name="GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007"/>
@@ -22,6 +22,6 @@
     <Argument>@TargetDir@/bin/</Argument>
    </Operation>
   </Operations>
-  <SHA1>a30190f64d181ad066faeb8b5538997456ce8f27</SHA1>
+  <SHA1>a52eab23ded00780fb07161849bf258f3bb1a068</SHA1>
  </PackageUpdate>
 </Updates>
