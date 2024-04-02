@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-    <DisplayName>SpotifyEnhancer</DisplayName>
-    <Description>Install SpotifyEnhancer 1.7.6, a programm to automatically restart Spotify when advertisement is played.</Description>
-    <Version>1.7.6</Version>
-    <Default>true</Default>
-
-    <ReleaseDate>2023-11-10</ReleaseDate>
-    <Licenses>
-        <License name="GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007" file="license.txt" />
-    </Licenses>
-
-    <Operations>
+   <DisplayName>SpotifyEnhancer 1.9.1</DisplayName>
+   <Description>This is Spotify Pro!</Description>
+   <Version>1.9.1</Version>
+   <Default>true</Default>
+   <ReleaseDate>2024-04-03</ReleaseDate>
+   <Operations>
         <Operation name="Extract">
-            <Argument>@TargetDir@/bin/</Argument>
+              <Argument>@TargetDir@/bin/</Argument>
         </Operation>
-    </Operations>
-	
-	<Script>installscript.qs</Script>
-
-</Package>
+   </Operations>
+   <Script>installscript.qs</Script>
+</Package> 
