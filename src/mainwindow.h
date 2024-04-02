@@ -41,7 +41,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    QString version = "1.9.1";
+    QString version = "1.9.2";
 
 public:
     MainWindow(QWidget *parent = nullptr);
