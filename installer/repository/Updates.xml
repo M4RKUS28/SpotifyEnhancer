@@ -2,8 +2,8 @@
  <ApplicationName>{AnyApplication}</ApplicationName>
  <ApplicationVersion>1.0.0</ApplicationVersion>
  <Checksum>true</Checksum>
- <SHA1>a448d36537bbcf33ef8b67bd5dc7d8e383fe8abe</SHA1>
- <MetadataName>2024-04-03-0141_meta.7z</MetadataName>
+ <SHA1>2fc56cc9b7d54060ce90d8fded65f84f1bea882d</SHA1>
+ <MetadataName>2024-04-03-0144_meta.7z</MetadataName>
  <PackageUpdate>
   <Name>de.SpotifyEnhancer.main</Name>
   <DisplayName>SpotifyEnhancer 1.9.1</DisplayName>
@@ -12,13 +12,13 @@
   <Default>true</Default>
   <ReleaseDate>2024-04-03</ReleaseDate>
   <Script>installscript.qs</Script>
-  <UpdateFile UncompressedSize="71946175" OS="Any" CompressedSize="21603581"/>
+  <UpdateFile UncompressedSize="71946175" CompressedSize="21603579" OS="Any"/>
   <DownloadableArchives>generic.7z,iconengines.7z,imageformats.7z,networkinformation.7z,platforms.7z,styles.7z,tls.7z,translations.7z,content.7z</DownloadableArchives>
   <Operations>
    <Operation name="Extract">
     <Argument>@TargetDir@/bin/</Argument>
    </Operation>
   </Operations>
-  <SHA1>0745553b737438beb258514acf9a73eef67c5bb4</SHA1>
+  <SHA1>bf3536df37dc95fe04353690117bbe5b4f5fa01b</SHA1>
  </PackageUpdate>
 </Updates>
