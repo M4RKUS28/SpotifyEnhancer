@@ -1,24 +1,3 @@
-<Updates>
- <ApplicationName>{AnyApplication}</ApplicationName>
- <ApplicationVersion>1.0.0</ApplicationVersion>
- <Checksum>true</Checksum>
- <SHA1>ac0a9a7d543080d67fa22d26029c9a940b211454</SHA1>
- <MetadataName>2024-04-03-0206_meta.7z</MetadataName>
- <PackageUpdate>
-  <Name>de.SpotifyEnhancer.main</Name>
-  <DisplayName>SpotifyEnhancer 1.9.2</DisplayName>
-  <Description>This is Spotify Pro!</Description>
-  <Version>1.9.2</Version>
-  <Default>true</Default>
-  <ReleaseDate>2024-04-03</ReleaseDate>
-  <Script>installscript.qs</Script>
-  <UpdateFile UncompressedSize="71946175" OS="Any" CompressedSize="21603586"/>
-  <DownloadableArchives>generic.7z,iconengines.7z,imageformats.7z,networkinformation.7z,platforms.7z,styles.7z,tls.7z,translations.7z,content.7z</DownloadableArchives>
-  <Operations>
-   <Operation name="Extract">
-    <Argument>@TargetDir@/bin/</Argument>
-   </Operation>
-  </Operations>
-  <SHA1>a415f23b2697c5eac36271b8d587f95495829b14</SHA1>
- </PackageUpdate>
-</Updates>
+version https://git-lfs.github.com/spec/v1
+oid sha256:53af2c2119ddecc8db09cbcdb6a9cf5da24c091e87e863cf0b127b150fcaa534
+size 984
