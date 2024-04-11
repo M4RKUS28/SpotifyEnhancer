@@ -2,7 +2,7 @@ QT       += core gui
 #LIBS += -luser32 -lgdi32
 LIBS += -lws2_32
 
-win32:RC_ICONS += spotify-32.ico
+win32:RC_ICONS += icons/spotify-32.ico
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

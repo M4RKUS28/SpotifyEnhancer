@@ -41,7 +41,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    QString version = "1.9.2";
+    QString version = "1.10.0";
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -52,7 +52,7 @@ public:
     SpotifyManager * spotmngr;
     DialogUeber * dialogUeber;
 
-    Switch * switchbtn,
+    Switch
         *autoStartBtn,
         *appbackgroundBtn,
         *status_btn,
@@ -90,16 +90,6 @@ private:
 
     const int DELAY_TRANISITION = 5000;
 
-
-    enum REMOVE_TO_DO_WATER_MARK {
-        NONE,
-        AUTO_ON_START_UP,
-        UNDO_CHANGES
-    };
-
-    void removeWaterMark(MainWindow::REMOVE_TO_DO_WATER_MARK toDO);
-
-
     // Custom message identifier
 #define WM_TRAYICON (WM_USER + 1)
 
@@ -120,7 +110,6 @@ private slots:
     void startSpotSlot();
     void stopSpotSlot();
 
-    void toggledWinWaterMarkSwitchBtn(bool checked);
     void toggledAutostartBtn(bool checked);
     void toggledBackgroundBtn(bool checked);
     void toggledstatus_btn(bool checked);
@@ -151,6 +140,7 @@ private slots:
     void on_actionAuf_Updates_pr_fen_triggered();
     void on_comboBoxTestRate_currentIndexChanged(int index);
     void on_comboBox_delayTime_currentIndexChanged(int index);
+    void on_pushButtonremovewatermark_clicked();
 };
 
 

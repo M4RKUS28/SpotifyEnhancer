@@ -36,7 +36,7 @@ Menu::Menu(QWidget * parent)
 // }
 
 
-void Menu::resizeEvent(QResizeEvent *event)
+void Menu::resizeEvent(QResizeEvent *)
 {
     // rounded menue window widget edges
     int radius = 6;
