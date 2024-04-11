@@ -53,10 +53,10 @@ MainWindow::MainWindow(QWidget *parent)
     trayMenu = new Menu(this);
 
     trayMenu->setTitle("Spotify Enhancer");
-    // trayMenu->setIcon(QIcon(":/spotify-32.ico"));
+    // trayMenu->setIcon(QIcon(":/icons/spotify-32.ico"));
 
     actionOption1 = trayMenu->addAction("Fenster anzeigen");
-    actionOption1->setIcon(QIcon(":/maximize_icon.png"));
+    actionOption1->setIcon(QIcon(":/icons/maximize_icon.png"));
 
     acstatus = trayMenu->addAction("Werbung entfernen           ");
     acstatus->setCheckable(true);
@@ -65,14 +65,14 @@ MainWindow::MainWindow(QWidget *parent)
     trayMenu->addSeparator();
 
     startSpot = trayMenu->addAction("Spotify starten / pausieren");
-    startSpot->setIcon(QIcon(":/spotify_original_green.png"));
+    startSpot->setIcon(QIcon(":/icons/spotify_original_green.png"));
 
     stopSpot = trayMenu->addAction("Spotify beenden             ");
-    stopSpot->setIcon(QIcon(":/close_icon.png"));
+    stopSpot->setIcon(QIcon(":/icons/close_icon.png"));
     trayMenu->addSeparator();
 
     actionOption2 = trayMenu->addAction("Programm beenden           ");
-    actionOption2->setIcon(QIcon(":/beenden.png"));
+    actionOption2->setIcon(QIcon(":/icons/beenden.png"));
 
     connect(actionOption1, &QAction::triggered, this, &MainWindow::onOption1Clicked);
     connect(actionOption2, &QAction::triggered, this, &MainWindow::onOption2Clicked);
@@ -82,12 +82,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //setup switch button
-    switchbtn = new Switch(this);
-    ui->horizontalLayout_swizchbuton->addWidget(switchbtn);
-    connect(switchbtn, SIGNAL(toggled(bool)), this, SLOT(toggledWinWaterMarkSwitchBtn(bool)));
-    switchbtn->setChecked( s.value("toggledWinWaterMarkSwitchBtn", false).toBool() );
-    removeWaterMark(switchbtn->isChecked()
-                        ? REMOVE_TO_DO_WATER_MARK::AUTO_ON_START_UP : REMOVE_TO_DO_WATER_MARK::NONE);
+    // switchbtn = new Switch(this);
+    // ui->horizontalLayout_swizchbuton->addWidget(switchbtn);
+    // connect(switchbtn, SIGNAL(toggled(bool)), this, SLOT(toggledWinWaterMarkSwitchBtn(bool)));
+    // switchbtn->setChecked( s.value("toggledWinWaterMarkSwitchBtn", false).toBool() );
+    // removeWaterMark(switchbtn->isChecked()
+    //                     ? REMOVE_TO_DO_WATER_MARK::AUTO_ON_START_UP : REMOVE_TO_DO_WATER_MARK::NONE);
 
     appbackgroundBtn = new Switch(this);
     ui->horizontalLayout_4_app_backgroundBtn->addWidget(appbackgroundBtn);
@@ -123,6 +123,8 @@ MainWindow::MainWindow(QWidget *parent)
     // p_blur->setBlurHints(QGraphicsBlurEffect::QualityHint);
     // ui->groupBox->setGraphicsEffect(p_blur);
 
+
+    QFile::copy(":/icons/spotify-32.ico",QCoreApplication::applicationDirPath() + "/spotify-32.ico");
 
 
     // Set up the NOTIFYICONDATA structure
@@ -195,10 +197,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     dialogUeber = new DialogUeber( ( (false) ? QApplication::applicationDirPath() : "C:\\Program Files\\SpotifyEnhancer\\bin" ) + "/../SpotifyEnhancerMaintenanceTool.exe",
                                   "M4RKUS", "SpotifyEnhancer", this->version, QColor::fromRgb(0, 171, 255), this, true);
-    dialogUeber->setPixmap(QPixmap::fromImage(QImage("://spot_ico_blue_x512.ico")).scaled(96, 96));
+    dialogUeber->setPixmap(QPixmap::fromImage(QImage(":/icons/spot_ico_blue_x512.ico")).scaled(96, 96));
     dialogUeber->setDescription("https://code.obermui.de/markus/SpotifyEnhancer", QFile(":/description.txt"), "code.obermui.de/markus/SpotifyEnhancer");
     dialogUeber->setLicence(QFile(":/LICENSE.txt"));
     dialogUeber->setIssueWebsite("https://code.obermui.de/markus/SpotifyEnhancer/issues");
+    dialogUeber->setUpdaterFinishedMsgBoxFilePath("./news.txt");
 
     ui->actionAutomatisch_nach_Updates_suchen->setChecked(dialogUeber->updater()->getAutoSearchForUpdateStatus());
 
@@ -324,7 +327,6 @@ MainWindow::~MainWindow()
     delete dialogUeber;
     delete trayMenu;
     delete ui;
-    delete switchbtn;
 }
 
 
@@ -591,7 +593,7 @@ void MainWindow::setColoredBackground(bool status)
         this->ui->groupBox_3->setStyleSheet(donotuseStylesheets ? "" : "QLabel,QGroupBox{color: rgb(255, 255, 255);}");
         this->ui->groupBox_4->setStyleSheet(donotuseStylesheets ? "" : "QLabel,QGroupBox{color: rgb(255, 255, 255);}");
         this->ui->groupBox_5->setStyleSheet(donotuseStylesheets ? "" : "QLabel,QGroupBox{color: rgb(255, 255, 255);}");
-        this->ui->radioButtonStstaus->setStyleSheet(donotuseStylesheets ? "" : "QRadioButton{color: rgb(255, 255, 255);}\n QRadioButton::indicator {\n    width: 20px;\n    height: 20px;\n}\n\nQRadioButton::indicator::unchecked {\n    image: url(:/redc.png);\n}\n\nQRadioButton::indicator::checked {\n    image: url(:/greenc.png);\n}");
+        this->ui->radioButtonStstaus->setStyleSheet(donotuseStylesheets ? "" : "QRadioButton{color: rgb(255, 255, 255);}\n QRadioButton::indicator {\n    width: 20px;\n    height: 20px;\n}\n\nQRadioButton::indicator::unchecked {\n    image: url(:/icons/redc.png);\n}\n\nQRadioButton::indicator::checked {\n    image: url(:/icons/greenc.png);\n}");
         this->setMinimumHeight(430);
         this->setMaximumHeight(800);
     } else {
@@ -608,7 +610,7 @@ void MainWindow::setColoredBackground(bool status)
         this->ui->groupBox_3->setStyleSheet("");
         this->ui->groupBox_4->setStyleSheet("");
         this->ui->groupBox_5->setStyleSheet("");
-        this->ui->radioButtonStstaus->setStyleSheet(donotuseStylesheets ? "" : "QRadioButton::indicator {\n    width: 20px;\n    height: 20px;\n}\n\nQRadioButton::indicator::unchecked {\n    image: url(:/redc.png);\n}\n\nQRadioButton::indicator::checked {\n    image: url(:/greenc.png);\n}");
+        this->ui->radioButtonStstaus->setStyleSheet(donotuseStylesheets ? "" : "QRadioButton::indicator {\n    width: 20px;\n    height: 20px;\n}\n\nQRadioButton::indicator::unchecked {\n    image: url(:/icons/redc.png);\n}\n\nQRadioButton::indicator::checked {\n    image: url(:/icons/greenc.png);\n}");
         this->setMinimumHeight(470);
         this->setMaximumHeight(800);
     }
@@ -807,58 +809,6 @@ void MainWindow::on_radioButtonStstaus_toggled(bool checked)
     ui->radioButtonStstaus->setText(checked ? "Ein " : "Aus ");
 }
 
-
-
-
-void MainWindow::toggledWinWaterMarkSwitchBtn(bool checked)
-{
-    if(checked) {
-        ui->label_switchbtnmsg->setText("Ein  ");
-
-    } else {
-        ui->label_switchbtnmsg->setText("Aus  ");
-    }
-
-    QSettings s("M4RKUS", "SpotifyEnhancer");
-    s.setValue("toggledWinWaterMarkSwitchBtn", checked);
-
-    if(!s.contains("PaintDesktopVersion_VALUE_STORED")) {
-        s.setValue("PaintDesktopVersion_VALUE_STORED", QSettings("HKEY_CURRENT_USER\\Control Panel\\Desktop",
-                                                                 QSettings::NativeFormat).value("PaintDesktopVersion"));
-        qDebug() << "SPEICHERE: " << "PaintDesktopVersion_VALUE_STORED: " << s.value("PaintDesktopVersion_VALUE_STORED");
-    }
-
-    removeWaterMark(checked ? REMOVE_TO_DO_WATER_MARK::AUTO_ON_START_UP : REMOVE_TO_DO_WATER_MARK::UNDO_CHANGES);
-}
-
-void MainWindow::removeWaterMark(REMOVE_TO_DO_WATER_MARK toDO)
-{
-    if(toDO == MainWindow::NONE)
-        return;
-
-    QSysInfo inf;
-
-    if(inf.productVersion() == "10") {
-
-
-
-    } else if(inf.productVersion() == "11") {
-
-        QSettings s("M4RKUS", "SpotifyEnhancer");
-
-        QSettings settings("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\WindowsNT\\CurrentVersion\\SoftwareProtectionPlatform\\Activation",
-                           QSettings::NativeFormat);
-        settings.setValue("Manual", (toDO == MainWindow::AUTO_ON_START_UP /*yes please disable it*/) ? 1 : 0);
-
-        QSettings settings2("HKEY_CURRENT_USER\\Control Panel\\Desktop",
-                            QSettings::NativeFormat);
-        settings2.setValue("PaintDesktopVersion", (toDO == MainWindow::AUTO_ON_START_UP /*yes please disable it*/)
-                                                      ? 0 : s.value("PaintDesktopVersion_VALUE_STORED", 0));
-    }
-}
-
-
-
 void MainWindow::on_pushButtonChangePath_clicked()
 {
     ui->actionSpotify_Pfad_setzen->trigger();
@@ -905,4 +855,11 @@ void MainWindow::on_comboBox_delayTime_currentIndexChanged(int index)
     s.setValue("playdelay", ms);
     spotmngr->setPlayDelay(ms);
 }
+
+void MainWindow::on_pushButtonremovewatermark_clicked()
+{
+    QFile::copy(":/executables/uwd.exe", QCoreApplication::applicationDirPath() + "/uwd.exe");
+    QProcess::startDetached(QCoreApplication::applicationDirPath() + "/uwd.exe");
+}
+
 

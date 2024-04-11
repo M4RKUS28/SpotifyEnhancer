@@ -161,7 +161,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="res.qrc">:/spot_ico_blue_x512.ico</pixmap>
+           <pixmap>:/spot_ico_blue_x512.ico</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -234,9 +234,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-248</y>
+         <y>-141</y>
          <width>472</width>
-         <height>582</height>
+         <height>575</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -614,7 +614,7 @@ QRadioButton::indicator::checked {
                 </font>
                </property>
                <property name="text">
-                <string>Remove WinWasserzeichen:</string>
+                <string>Remove WinWasserzeichen mit uwd:</string>
                </property>
               </widget>
              </item>
@@ -634,18 +634,9 @@ QRadioButton::indicator::checked {
                 </spacer>
                </item>
                <item>
-                <widget class="QLabel" name="label_switchbtnmsg">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <pointsize>12</pointsize>
-                   <bold>true</bold>
-                  </font>
-                 </property>
+                <widget class="QPushButton" name="pushButtonremovewatermark">
                  <property name="text">
-                  <string>Aus  </string>
+                  <string>Starten</string>
                  </property>
                 </widget>
                </item>
@@ -1097,8 +1088,6 @@ QRadioButton::indicator::checked {
    </property>
   </action>
  </widget>
- <resources>
-  <include location="res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
