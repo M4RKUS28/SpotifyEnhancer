@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Installer>
 <Name>SpotifyEnhancer</Name>
-    <Version>1.10.0</Version>
+    <Version>1.10.1</Version>
     <Title><Name>SpotifyEnhancer</Name> Installer</Title>
       <Publisher>Markus</Publisher>
         <StartMenuDir>SpotifyEnhancer</StartMenuDir>
