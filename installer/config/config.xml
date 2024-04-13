@@ -3,6 +3,8 @@
 <Name>SpotifyEnhancer</Name>
     <Version>1.10.1</Version>
     <Title><Name>SpotifyEnhancer</Name> Installer</Title>
+    <InstallerApplicationIcon>installerIcon1</InstallerApplicationIcon>
+    <InstallerWindowIcon>installerIcon2</InstallerWindowIcon>
       <Publisher>Markus</Publisher>
         <StartMenuDir>SpotifyEnhancer</StartMenuDir>
         <TargetDir>@ApplicationsDir@/SpotifyEnhancer/</TargetDir>
