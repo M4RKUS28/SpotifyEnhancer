@@ -4,7 +4,7 @@
    <Description>This is Spotify Pro!</Description>
    <Version>1.10.1</Version>
    <Default>true</Default>
-   <ReleaseDate>2024-04-11</ReleaseDate>
+   <ReleaseDate>2024-04-13</ReleaseDate>
    <Operations>
         <Operation name="Extract">
               <Argument>@TargetDir@/bin/</Argument>
