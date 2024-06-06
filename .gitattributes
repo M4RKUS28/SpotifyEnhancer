@@ -1,0 +1,2 @@
+installer/repository/**/* filter=lfs diff=lfs merge=lfs -text
+installer/repository/* filter=lfs diff=lfs merge=lfs -text

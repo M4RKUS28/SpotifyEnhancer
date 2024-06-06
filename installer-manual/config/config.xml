@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>SpotifyEnhancer</Name>
+    <Version>1.7.7</Version>
+    <Title><Name>SpotifyEnhancer</Name> Installer</Title>
+    
+    <Logo>spot_ico1.png</Logo>
+
+    <!--
+    <Banner>spot_ico2.png</Banner>
+
+    <ProductImages>
+	<ProductImage>
+		<Image>spot_ico3.png</Image>
+	</ProductImage>
+    </ProductImages>
+
+    <Watermark>spot_ico.png</Watermark>
+    -->
+    <InstallerApplicationIcon>spotify-32</InstallerApplicationIcon>
+    <InstallerWindowIcon>spotify-32-2</InstallerWindowIcon>
+
+    <Publisher>Markus</Publisher>
+    <StartMenuDir>SpotifyEnhancer</StartMenuDir>
+    <TargetDir>@ApplicationsDirUser@/SpotifyEnhancer/</TargetDir>
+    <WizardDefaultWidth>800</WizardDefaultWidth>
+    <WizardDefaultHeight>500</WizardDefaultHeight>
+	<MaintenanceToolName>SpotifyEnhancerMaintenanceTool</MaintenanceToolName>
+	<RemoteRepositories>
+     <Repository>
+             <Url>https://code.obermui.de/markus/SpotifyEnhancer/raw/branch/main/installer/repository</Url>
+             <Enabled>1</Enabled>
+             <DisplayName>Gitea Repo</DisplayName>
+     </Repository>
+</RemoteRepositories>
+	
+</Installer>

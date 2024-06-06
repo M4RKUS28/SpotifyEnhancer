@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>SpotifyEnhancer</DisplayName>
+    <Description>Install SpotifyEnhancer 1.9.0, a programm to automatically restart Spotify when advertisement is played.</Description>
+    <Version>1.9.0</Version>
+    <Default>true</Default>
+
+    <ReleaseDate>2023-12-13</ReleaseDate>
+    <Licenses>
+        <License name="GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007" file="license.txt" />
+    </Licenses>
+
+    <Operations>
+        <Operation name="Extract">
+            <Argument>@TargetDir@/bin/</Argument>
+        </Operation>
+    </Operations>
+	
+	<Script>installscript.qs</Script>
+
+</Package>

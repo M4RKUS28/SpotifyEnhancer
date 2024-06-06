@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>LICENSE.txt</file>
+        <file>description.txt</file>
+        <file>icons/appicon.ico</file>
+        <file>icons/beenden.png</file>
+        <file>icons/close_icon.png</file>
+        <file>icons/greenc.png</file>
+        <file>icons/IEC5009_Standby_Symbol.svg.png</file>
+        <file>icons/maximize_icon.png</file>
+        <file>icons/redc.png</file>
+        <file>icons/spot_ico.png</file>
+        <file>icons/spot_ico_blue_x512.ico</file>
+        <file>icons/spotify_original_green.png</file>
+        <file>icons/spotify-32.ico</file>
+        <file>executables/uwd.exe</file>
+    </qresource>
+</RCC>

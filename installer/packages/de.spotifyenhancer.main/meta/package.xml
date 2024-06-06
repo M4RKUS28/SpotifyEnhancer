@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+   <DisplayName>SpotifyEnhancer 1.10.2</DisplayName>
+   <Description>SpotifyEnhancer!!!</Description>
+   <Version>1.10.2</Version>
+   <Default>true</Default>
+   <ReleaseDate>2024-06-03</ReleaseDate>
+   <Licenses>
+   <License name="GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007" file="license.txt" />
+   </Licenses>
+   <Operations>
+        <Operation name="Extract">
+              <Argument>@TargetDir@/bin/</Argument>
+        </Operation>
+   </Operations>
+   <Script>installscript.qs</Script>
+</Package> 
