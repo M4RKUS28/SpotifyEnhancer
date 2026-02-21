@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-   <DisplayName>SpotifyEnhancer 1.11.0</DisplayName>
+   <DisplayName>SpotifyEnhancer 1.11.1</DisplayName>
    <Description>SpotifyEnhancer runs silently in the background and monitors the Spotify window title. As soon as an advertisement is detected, it closes Spotify and immediately restarts it, resuming your music without interaction.</Description>
-   <Version>1.11.0</Version>
+   <Version>1.11.1</Version>
    <Default>true</Default>
    <ReleaseDate>2026-02-21</ReleaseDate>
    <Operations>
