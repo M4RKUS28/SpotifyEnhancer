@@ -1,7 +1,6 @@
 #include "menue.h"
 #include <QPainterPath>
 #include <QString>
-#include <QString>
 #include <QRegion>
 
 #include <QPainter>

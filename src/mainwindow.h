@@ -49,15 +49,6 @@ public:
 
     void closeEvent(QCloseEvent* event) override;
 
-    SpotifyManager * spotmngr;
-    DialogUeber * dialogUeber;
-
-    Switch
-        *autoStartBtn,
-        *appbackgroundBtn,
-        *status_btn,
-        * transition_btn;
-
 
 private slots:
     void on_actionSpotify_Pfad_setzen_triggered();
@@ -88,10 +79,21 @@ private:
     const int DELAY_INTERVALL_MITTEL = 500;
     const int DELAY_INTERVALL_HOCH = 1000;
 
-    const int DELAY_TRANISITION = 5000;
+    const int DELAY_TRANSITION = 5000;
 
     // Custom message identifier
-#define WM_TRAYICON (WM_USER + 1)
+    static constexpr UINT WM_TRAYICON = WM_USER + 1;
+
+    NOTIFYICONDATA nid{};
+
+    SpotifyManager * spotmngr;
+    DialogUeber * dialogUeber;
+
+    Switch
+        *autoStartBtn,
+        *appbackgroundBtn,
+        *status_btn,
+        *transition_btn;
 
     // Handle system tray events
     virtual bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;

@@ -5,10 +5,6 @@
 #include <QThread>
 #include <windows.h>
 
-
-#include <QDebug>
-#include <iostream>
-
 struct v_window {
     v_window() {
     }
@@ -44,7 +40,7 @@ public:
     void setExePath(QString newPath);
     QString getExePath();
 
-    int getGesammtAnzahl();
+    int getGesamtAnzahl();
     bool startSpotify();
     bool searchSpotifyWindow(v_window *vw, int trys = 30);
     bool sendPlaySignal(v_window w);
@@ -54,7 +50,7 @@ private:
 
     int counts;
     int ms_checkrate;
-    int ransitionWaitingTime;
+    int transitionWaitingTime;
 
     static constexpr int default_check_rate = 800;
     bool use_special_methode;

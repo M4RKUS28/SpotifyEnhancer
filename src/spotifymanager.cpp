@@ -11,12 +11,11 @@
 #include <iostream>
 #include <string>
 #include <tlhelp32.h>
-#include <unistd.h>
 #include <chrono>
 #include <thread>
 #include <vector>
 #include <psapi.h>
-#include <iostream>
+#include <QDebug>
 
 
 
@@ -59,24 +58,29 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     auto handles = reinterpret_cast<v_window*>(lParam);
     if (handles->checkInv || IsWindowVisible(hwnd)) {
-        std::vector<char> buffer(GetWindowTextLengthA(hwnd) + 1);
-        if(! GetWindowTextA(hwnd, buffer.data(), buffer.size())) {
+        int textLen = GetWindowTextLengthA(hwnd);
+        if (textLen <= 0)
             return true;
-        }
-        if(buffer.data()) {
-            auto s = std::string(GetExecutablePathFromWindowHandle(hwnd));
-            if(s.find(handles->exe) != std::string::npos) {
-                if(buffer.data() == handles->checkTitel) {
-                    handles->count += 1;
-                    handles->last_name_fitted_test_hwnd = hwnd;
-                }
-                handles->window = hwnd;
-//                std::cout << hwnd << ": " << buffer.data() <<std::endl;
-                handles->path = s;
-                handles->titel = buffer.data();
-            }
-        }
+        std::vector<char> buffer(textLen + 1);
+        if (!GetWindowTextA(hwnd, buffer.data(), buffer.size()))
+            return true;
 
+        // Pre-filter: if a specific title is required, check it cheaply before the
+        // expensive path lookup
+        std::string title = buffer.data();
+        if (!handles->checkTitel.empty() && title != handles->checkTitel)
+            return true;
+
+        auto s = std::string(GetExecutablePathFromWindowHandle(hwnd));
+        if (s.find(handles->exe) != std::string::npos) {
+            if (title == handles->checkTitel) {
+                handles->count += 1;
+                handles->last_name_fitted_test_hwnd = hwnd;
+            }
+            handles->window = hwnd;
+            handles->path = s;
+            handles->titel = title;
+        }
     }
     return true;
 }
@@ -90,7 +94,7 @@ SpotifyManager::SpotifyManager()
     this->ms_checkrate = 1000;
     use_special_methode = false;
     playDelay = 500;
-    ransitionWaitingTime = 0;
+    transitionWaitingTime = 0;
 }
 
 SpotifyManager::~SpotifyManager()
@@ -155,10 +159,11 @@ void SpotifyManager::stop()
 
 void SpotifyManager::loadExePath()
 {
-    bool init = QSettings("SpotifyEnhancer", "SpotifyEnhancer").contains("exePath");
+    QSettings s("M4RKUS", "SpotifyEnhancer");
+    bool init = s.contains("exePath");
     QString default_path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/../Spotify/Spotify.exe";
 
-    exePath = QSettings("SpotifyEnhancer", "SpotifyEnhancer").value("exePath", default_path).toString();
+    exePath = s.value("exePath", default_path).toString();
     if(!init && !QFile(default_path).exists()) {
         QMessageBox::information(nullptr, "Spotify Pfad festlegen", "Um Spotify Enhancer verwenden zu können, müssen sie den Pfad zur Spotify Anwendung festlegen! (Unter Einstellungen -> Spotify Pfad setzen)"
                                                                     "\n\nWichtig: Spotify muss über einen Installer in einem echten Ordner installiert sein "
@@ -169,7 +174,7 @@ void SpotifyManager::loadExePath()
 void SpotifyManager::setExePath(QString newPath)
 {
 
-    QSettings("SpotifyEnhancer", "SpotifyEnhancer").setValue("exePath", (exePath = newPath));
+    QSettings("M4RKUS", "SpotifyEnhancer").setValue("exePath", (exePath = newPath));
 }
 
 QString SpotifyManager::getExePath()
@@ -177,16 +182,14 @@ QString SpotifyManager::getExePath()
     return exePath;
 }
 
-int SpotifyManager::getGesammtAnzahl()
+int SpotifyManager::getGesamtAnzahl()
 {
-
-    return QSettings("SpotifyEnhancer", "SpotifyEnhancer").value("gesammtAnzahlUebersprungeneWerbungen", 0).toInt();
-
+    return QSettings("M4RKUS", "SpotifyEnhancer").value("gesamtAnzahlUebersprungeneWerbungen", 0).toInt();
 }
 
 int SpotifyManager::load_and_getMs_checkrate()
 {
-    ms_checkrate = QSettings("SpotifyEnhancer", "SpotifyEnhancer").value("ms_checkrate", this->default_check_rate).toInt();
+    ms_checkrate = QSettings("M4RKUS", "SpotifyEnhancer").value("ms_checkrate", this->default_check_rate).toInt();
     std::cout << "  -> LOADED ms_checkrate := " << ms_checkrate << std::endl;
     return ms_checkrate;
 }
@@ -198,7 +201,7 @@ int SpotifyManager::getCounts() const
 
 void SpotifyManager::setMs_checkrate(int newMs_checkrate)
 {
-    QSettings("SpotifyEnhancer", "SpotifyEnhancer").setValue("ms_checkrate", (ms_checkrate = newMs_checkrate));
+    QSettings("M4RKUS", "SpotifyEnhancer").setValue("ms_checkrate", (ms_checkrate = newMs_checkrate));
     std::cout << "  -> ms_checkrate := " << newMs_checkrate << std::endl;
 }
 
@@ -230,7 +233,7 @@ void SpotifyManager::run()
 
             if( ! IsWindow(vw.window)) {
                 //Spotify closed
-                std::cout << "Stoptify closed!!!" << std::endl;
+                std::cout << "Spotify closed!" << std::endl;
                 sleep(2);
                 closed = true;
                 break;
@@ -278,7 +281,7 @@ void SpotifyManager::run()
                     //Advertisement
                     counts++;
                     emit updateReq();
-                    QSettings("SpotifyEnhancer", "SpotifyEnhancer").setValue("gesammtAnzahlUebersprungeneWerbungen", this->getGesammtAnzahl() + 1);
+                    QSettings("M4RKUS", "SpotifyEnhancer").setValue("gesamtAnzahlUebersprungeneWerbungen", this->getGesamtAnzahl() + 1);
 
                     //RESTARTING:::::::::
                     break;
@@ -302,7 +305,7 @@ void SpotifyManager::run()
         std::cout << "FOUND ADVERTISEMENT!!: " << vw.titel << " restarting..." << std::endl;
 
         //Wait delay
-        msleep(ransitionWaitingTime);
+        msleep(transitionWaitingTime);
 
         // Check if 60 sec  has elapsed
         std::chrono::steady_clock::time_point current_time = std::chrono::steady_clock::now();
@@ -335,13 +338,13 @@ void SpotifyManager::run()
 
         // searchSpotifyWindow
         if( ! searchSpotifyWindow(&vw) ) {
-            std::cerr << "Couldnd find spoitfy after restart" << std::endl;
+            std::cerr << "Couldn't find Spotify after restart" << std::endl;
             break;
         }
         msleep(100);
 
         if( !sendPlaySignal(vw) ) {
-            std::cerr << "Couldnd start playing after restart" << std::endl;
+            std::cerr << "Couldn't start playing after restart" << std::endl;
         }
 
         // Increment loop count
@@ -380,7 +383,7 @@ bool SpotifyManager::stopSpotify(v_window w)
     }
 
     // Wait for the process to exit
-    DWORD waitResult = WaitForSingleObject(hProcess, INFINITE);
+    DWORD waitResult = WaitForSingleObject(hProcess, 5000);
     if (waitResult == WAIT_FAILED) {
         // Handle error
         DWORD error = GetLastError();
@@ -423,9 +426,8 @@ void SpotifyManager::setPlayDelay(int newPlayDelay)
 
 void SpotifyManager::setTransitionWaitingTime(int waitingTime)
 {
-    ransitionWaitingTime = waitingTime;
-    std::cout << "  -> transitionWaitingTime := " << ransitionWaitingTime << std::endl;
-
+    transitionWaitingTime = waitingTime;
+    std::cout << "  -> transitionWaitingTime := " << transitionWaitingTime << std::endl;
 }
 
 void SpotifyManager::setUse_special_methode(bool newUse_special_methode)
@@ -448,6 +450,8 @@ bool SpotifyManager::startSpotify()
     qDebug() << "Wait for the program to start";
     // Wait for the program to start
     WaitForInputIdle(pi.hProcess, INFINITE);
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
     qDebug() << "started";
     return true;
 }
@@ -544,11 +548,11 @@ bool  SpotifyManager::sendPlaySignal(v_window new_win)
 void SpotifyManager::sleep(int seconds)
 {
     for(int i = 0; i < seconds * 100 && !this->isInterruptionRequested(); i++)
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 void SpotifyManager::msleep(int m_seconds)
 {
     for(int i = 0; i < m_seconds / 10 && !this->isInterruptionRequested(); i++)
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }

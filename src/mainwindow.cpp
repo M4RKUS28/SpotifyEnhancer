@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QCloseEvent>
 #include <QPushButton>
+#include <QProcess>
 
 #include "stylehandler.h"
 
@@ -91,29 +92,29 @@ MainWindow::MainWindow(QWidget *parent)
 
     appbackgroundBtn = new Switch(this);
     ui->horizontalLayout_4_app_backgroundBtn->addWidget(appbackgroundBtn);
-    connect(appbackgroundBtn, SIGNAL(toggled(bool)), this, SLOT(toggledBackgroundBtn(bool)));
+    connect(appbackgroundBtn, &QAbstractButton::toggled, this, &MainWindow::toggledBackgroundBtn);
 
 
     autoStartBtn = new Switch(this);
     ui->horizontalLayout_autostartBtn->addWidget(autoStartBtn);
-    connect(autoStartBtn, SIGNAL(toggled(bool)), this, SLOT(toggledAutostartBtn(bool)));
+    connect(autoStartBtn, &QAbstractButton::toggled, this, &MainWindow::toggledAutostartBtn);
 
     status_btn = new Switch(this);
     ui->horizontalLayout_7statusbtn->addWidget(status_btn);
-    connect(status_btn, SIGNAL(toggled(bool)), this, SLOT(toggledstatus_btn(bool)));
+    connect(status_btn, &QAbstractButton::toggled, this, &MainWindow::toggledstatus_btn);
 
 
     transition_btn = new Switch(this);
     ui->horizontalLayout_tranisition->addWidget(transition_btn);
-    connect(transition_btn, SIGNAL(toggled(bool)), this, SLOT(toggled_transition_btn(bool)));
+    connect(transition_btn, &QAbstractButton::toggled, this, &MainWindow::toggled_transition_btn);
     transition_btn->setChecked( s.value("transition_btn", false).toBool() );
     ui->transisition_status_label->setText(transition_btn->isChecked() ? "Ein" : "Aus");
-    this->spotmngr->setTransitionWaitingTime(transition_btn->isChecked() ? DELAY_TRANISITION : 0);
+    this->spotmngr->setTransitionWaitingTime(transition_btn->isChecked() ? DELAY_TRANSITION : 0);
 
     //OS THEME THINGS
 
     //changeevent
-    connect(QApplication::styleHints(), SIGNAL(colorSchemeChanged(Qt::ColorScheme)), this, SLOT(colorSchemeChanged(Qt::ColorScheme)));
+    connect(QApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, &MainWindow::colorSchemeChanged);
 
     //combobox default
     ui->comboBoxOSTheme->setCurrentIndex( (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Light) ? 0 : 1 );
@@ -128,7 +129,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // Set up the NOTIFYICONDATA structure
-    NOTIFYICONDATA nid;
     nid.cbSize = sizeof(NOTIFYICONDATA);
     nid.hWnd = (HWND)winId();
     nid.uID = 1;
@@ -178,14 +178,13 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
 //    connect(spotmngr, SIGNAL(updateReq()), this, SLOT(updateCounts()));
-    connect(spotmngr, SIGNAL(stopedSpot()), this, SLOT(showThis()));
+    connect(spotmngr, &SpotifyManager::stopedSpot, this, &MainWindow::showThis);
 
 //    // Handle the tray icon context menu
 //    connect(this, &MainWindow::customContextMenuRequested, this, &MainWindow::showContextMenu);
 //    connect(this, &MainWindow::mousePressEvent, this, &MainWindow::onTrayIconClicked);
 
     on_radioButtonStstaus_clicked(ui->radioButtonStstaus->isChecked());
-
 
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     ui->actionAutostart->setChecked( settings.contains("SpotifyEnhancer") );
@@ -195,7 +194,7 @@ MainWindow::MainWindow(QWidget *parent)
     on_actionAutostart_triggered(ui->actionAutostart->isChecked());
     ui->label_exepath_2->setText( spotmngr->getExePath() );
 
-    dialogUeber = new DialogUeber( ( (false) ? QApplication::applicationDirPath() : "C:\\Program Files\\SpotifyEnhancer\\bin" ) + "/../SpotifyEnhancerMaintenanceTool.exe",
+    dialogUeber = new DialogUeber( QCoreApplication::applicationDirPath() + "/../SpotifyEnhancerMaintenanceTool.exe",
                                   "M4RKUS", "SpotifyEnhancer", this->version, QColor::fromRgb(0, 171, 255), this, true);
     dialogUeber->setPixmap(QPixmap::fromImage(QImage(":/icons/spot_ico_blue_x512.ico")).scaled(96, 96));
     dialogUeber->setDescription("https://code.obermui.de/markus/SpotifyEnhancer", QFile(":/description.txt"), "code.obermui.de/markus/SpotifyEnhancer");
@@ -296,7 +295,7 @@ void MainWindow::toggled_transition_btn(bool checked)
     QSettings s("M4RKUS", "SpotifyEnhancer");
     s.setValue("transition_btn", checked);
     ui->transisition_status_label->setText(transition_btn->isChecked() ? "Ein" : "Aus");
-    this->spotmngr->setTransitionWaitingTime(transition_btn->isChecked() ? DELAY_TRANISITION : 0);
+    this->spotmngr->setTransitionWaitingTime(transition_btn->isChecked() ? DELAY_TRANSITION : 0);
 }
 
 void MainWindow::on_actionForceForeground_triggered()
@@ -323,6 +322,7 @@ void MainWindow::on_actionColored_Background_triggered(bool checked)
 
 MainWindow::~MainWindow()
 {
+    Shell_NotifyIcon(NIM_DELETE, &nid);
     delete spotmngr;
     delete dialogUeber;
     delete trayMenu;
@@ -358,25 +358,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if (msgBox.clickedButton() == hideButton)
     {
         QApplication::setQuitOnLastWindowClosed(true);
-
-        event->ignore();  // Das Schließen des Fensters ignorieren
-        hide();          // Das Fenster verstecken
-        qDebug() << "a1";
+        event->ignore();
+        hide();
         return;
     }
     else if (msgBox.clickedButton() == exitButton)
     {
-        event->accept();  // Das Programm beenden
-
+        event->accept();
         QApplication::quit();
-
-        qDebug() << "a2";
-
     } else if(msgBox.clickedButton() == aboardButton || msgBox.clickedButton() == nullptr)
     {
-        event->ignore();  // Das Schließen des Fensters ignorieren
-        qDebug() << "a3";
-
+        event->ignore();
         return;
     }
 }
@@ -566,7 +558,6 @@ void MainWindow::colorSchemeChanged(Qt::ColorScheme)
 {
     setColoredBackground(appbackgroundBtn->isChecked());
     ui->comboBoxOSTheme->setCurrentIndex(  (qApp->styleHints()->colorScheme() == Qt::ColorScheme::Light) ? 0 : 1 );
-    qDebug() << "MOIN";
 }
 
 void MainWindow::setColoredBackground(bool status)
@@ -753,16 +744,13 @@ QString formatiereSekunden(int sekunden)
 
 void MainWindow::on_actionGesammtzahl_Werbungen_triggered()
 {
-    int ges = spotmngr->getGesammtAnzahl();
+    int ges = spotmngr->getGesamtAnzahl();
     QMessageBox::information(this, "Gesamtanzahl übersprungener Werbungen", "Insgesamt hast du bereits " + QString::number(ges) + " Werbungen übersprungen!\nDamit hast mehr als du dir mehr als " + formatiereSekunden(ges * 30) + " Werbung erspart!" );
 }
 
 void MainWindow::on_action_ber_triggered()
 {
-    qDebug() << "start";
     dialogUeber->exec();
-    qDebug() << "finished";
-
 }
 
 
@@ -793,12 +781,8 @@ void MainWindow::on_radioButtonStstaus_clicked(bool status)
     this->ui->radioButtonStstaus->setDisabled(false);
 }
 
-#include <QApplication>
 void MainWindow::on_pushButtonExit_clicked()
 {
-//    QCloseEvent *closeEvent = new QCloseEvent();
-//    //closeEvent->accept(); // You can set the accepted state as needed
-//    QApplication::sendEvent(this, closeEvent);
     this->close();
 }
 
@@ -858,44 +842,35 @@ void MainWindow::on_comboBox_delayTime_currentIndexChanged(int index)
 
 void MainWindow::on_pushButtonremovewatermark_clicked()
 {
-    QString targetPath = QCoreApplication::applicationDirPath() + "/uwd.exe";
-    //QFile::copy(":/executables/uwd.exe", QCoreApplication::applicationDirPath() + "/uwd.exe");
-    if(!QFile(targetPath).exists()) {
-        if ( QFile::copy(":/executables/uwd.exe", targetPath)) {
-            qDebug() << "File copied successfully to" << targetPath;
-        } else {
-            qDebug() << "Failed to copy the file.";
+     // Temp-Verzeichnis holen
+    QString tempDirPath = QDir::tempPath();
+    QDir tempDir(tempDirPath);
+
+    // Zielpfad im Temp-Ordner
+    QString targetPath = tempDir.filePath("uwd.exe");
+
+    // Datei kopieren (falls noch nicht vorhanden)
+    if (!QFile::exists(targetPath)) {
+        if (!QFile::copy(":/executables/uwd.exe", targetPath)) {
+            QMessageBox::warning(this,
+                                 "Fehler",
+                                 "Kopieren der Datei in den Temp-Ordner fehlgeschlagen.");
+            return;
         }
     }
-    // Check and set the execute permissions
-    QFile targetFile(targetPath);
-    QFileDevice::Permissions permissions = targetFile.permissions();
 
-    // Check if execute permissions are set
-    if (!(permissions & QFileDevice::ExeUser)) {
-        // Add execute permissions for the user, group, and others
-        permissions |= QFileDevice::ExeUser | QFileDevice::ExeGroup | QFileDevice::ExeOther;
-        if (!targetFile.setPermissions(permissions)) {
-            qDebug() << "Failed to set execute permissions.";
-            return; // Exit with an error code
-        } else {
-            qDebug() << "Execute permissions set successfully.";
-        }
-    } else {
-        qDebug() << "Execute permissions are already set.";
-    }
+    // Explorer öffnen und Datei markieren
+    QString explorerCommand = "explorer.exe";
+    QStringList arguments;
+    arguments << "/select," << QDir::toNativeSeparators(targetPath);
 
-    if (QProcess::startDetached(targetPath)) {
-        qDebug() << "Process started successfully.";
-    } else {
-        qDebug() << "Failed to start the process.";
-    }
+    QProcess::startDetached(explorerCommand, arguments);
 
-    QProcess p;
-
-    if(!p.startDetached(QCoreApplication::applicationDirPath() + "/uwd.exe")) {
-        QMessageBox::warning(this, "Failed to start uwd!", "Failed to start uwd: " + p.errorString());
-    }
+    // Hinweis an den Benutzer
+    QMessageBox::information(this,
+                             "Manueller Start erforderlich",
+                             "Die Datei wurde in den Temp-Ordner kopiert.\n\n"
+                             "Bitte führen Sie 'uwd.exe' manuell aus.");
 }
 
 

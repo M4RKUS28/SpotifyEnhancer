@@ -234,7 +234,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>-141</y>
+         <y>0</y>
          <width>472</width>
          <height>575</height>
         </rect>
@@ -1002,6 +1002,9 @@ QRadioButton::indicator::checked {
    <addaction name="menuInfo"/>
   </widget>
   <action name="actionSpotify_Pfad_setzen">
+   <property name="icon">
+    <iconset theme="document-open"/>
+   </property>
    <property name="text">
     <string>Spotify Pfad setzen</string>
    </property>
@@ -1028,6 +1031,9 @@ QRadioButton::indicator::checked {
    </property>
   </action>
   <action name="action_ber">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
    <property name="text">
     <string>Über SpotifyEnhancer</string>
    </property>
@@ -1038,6 +1044,9 @@ QRadioButton::indicator::checked {
    </property>
   </action>
   <action name="actionGesammtzahl_Werbungen">
+   <property name="icon">
+    <iconset theme="dialog-question"/>
+   </property>
    <property name="text">
     <string>Gesamtzahl Werbungen</string>
    </property>
@@ -1078,6 +1087,9 @@ QRadioButton::indicator::checked {
    </property>
   </action>
   <action name="actionAuf_Updates_pr_fen">
+   <property name="icon">
+    <iconset theme="view-refresh"/>
+   </property>
    <property name="text">
     <string>Nach Aktualisierungen suchen...</string>
    </property>
