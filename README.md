@@ -28,6 +28,7 @@ resuming your music without interaction.
 | Installer | Platform |
 |-----------|----------|
 | [SpotifyEnhancer Online Installer](https://code.obermui.de/Markus/SpotifyEnhancer/releases) | Windows x64 |
+| [`linux/linux_script.sh`](linux/linux_script.sh) | Linux (X11) |
 
 The online installer fetches the latest package components at install time and installs a
 `SpotifyEnhancerMaintenanceTool.exe` for future updates.
@@ -94,13 +95,72 @@ The resulting binary is placed in the `release/` folder.
 
 ---
 
+## Linux
+
+For Linux users there is a self-contained Bash script that implements the same
+ad-skipping logic without a GUI.
+
+### Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `wmctrl` | List windows and send close signal |
+| `xprop` | X11 window property queries |
+| `xdotool` | Send media-key input to the Spotify window |
+
+Install on common distributions:
+
+```bash
+# Debian / Ubuntu / Mint
+sudo apt update && sudo apt install wmctrl x11-utils xdotool
+
+# Fedora
+sudo dnf install wmctrl xorg-x11-utils xdotool
+
+# Arch Linux
+sudo pacman -S wmctrl xorg-xprop xdotool
+```
+
+The script auto-detects the distribution and prints the correct install command
+if any dependency is missing.
+
+### Usage
+
+```bash
+chmod +x linux/linux_script.sh
+./linux/linux_script.sh
+```
+
+Press `Ctrl+C` to stop. To run it in the background:
+
+```bash
+nohup ./linux/linux_script.sh &>/tmp/spotify_skipper.log &
+```
+
+### How It Works (Linux)
+
+1. Every 3 seconds, `wmctrl` lists all open windows and finds the Spotify entry.
+2. If the window title does not contain ` - ` (the `Artist – Title` separator) and
+   is not `Spotify Free` (paused state), an ad is assumed.
+3. The window is closed gracefully via `wmctrl -ic`; after 5 seconds without exit
+   the process is force-killed with `SIGKILL`.
+4. Spotify is relaunched using the path read from `/proc/<pid>/exe`
+   (works with both native installs and Snap/Flatpak).
+5. Once the new window appears, `xdotool key XF86AudioPlay` resumes playback.
+
+> **Note:** Requires an X11 session. Wayland compositors are not currently supported
+> because `xdotool` relies on X11 for key injection.
+
+---
+
 ## Known Limitations
 
 - **Fullscreen applications** – after a restart, Windows may not automatically return
   focus to your fullscreen app; you may need to Alt+Tab once.
 - **Rare start failures** – on some systems `CreateProcess` can fail to bring up the
   Spotify window in time; increasing the *delay time* setting usually helps.
-- **Microsoft Store Spotify** – not supported (no accessible `.exe` path).
+- **Microsoft Store Spotify** – not supported on Windows (no accessible `.exe` path).
+- **Linux / Wayland** – the Linux script requires X11; pure Wayland sessions are not supported.
 
 ---
 
