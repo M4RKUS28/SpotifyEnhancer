@@ -1,0 +1,3 @@
+[submodule "libs/MUpdaterLib"]
+	path = libs/MUpdaterLib
+	url = https://github.com/M4RKUS28/MUpdaterLib
