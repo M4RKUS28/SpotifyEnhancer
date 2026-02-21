@@ -40,8 +40,8 @@ RESOURCES += \
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/libs/MUpdaterLib/release/ -lMUpdater
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/libs/MUpdaterLib/debug/ -lMUpdater
 
-INCLUDEPATH += $$PWD/libs/MUpdaterLib
-DEPENDPATH += $$PWD/libs/MUpdaterLib
+INCLUDEPATH += $$PWD/libs/MUpdaterLib/src
+DEPENDPATH += $$PWD/libs/MUpdaterLib/src
 
 win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/libs/MUpdaterLib/release/libMUpdater.a
 else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/libs/MUpdaterLib/debug/libMUpdater.a

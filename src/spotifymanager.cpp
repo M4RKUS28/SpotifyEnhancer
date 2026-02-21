@@ -243,30 +243,24 @@ void SpotifyManager::run()
 
 
             //get titel
-            std::vector<char> buffer(GetWindowTextLengthA(vw.window) + 1);
             int windowTextLength = GetWindowTextLengthA(vw.window);
-            if (windowTextLength > 0) {
-                if (GetWindowTextA(vw.window, buffer.data(), buffer.size()) <= 0) {
-                    // Failed to get window text
-                    DWORD error = GetLastError();
-                    qDebug() << "Failed to get window text. Error code:" << error;
-                }
-            } else if (windowTextLength == 0) {
-                // Window has no text
-                qDebug() << "Window has no text.";
+            if (windowTextLength == 0) {
+                // Window has no text — Spotify is paused or closed
                 emit stopedSpot();
                 return;
-            } else {
+            } else if (windowTextLength < 0) {
                 // Failed to get window text length
                 DWORD error = GetLastError();
                 qDebug() << "Failed to get window text length. Error code:" << error;
                 emit stopedSpot();
                 return;
             }
-
-            if(buffer.empty() || !buffer.data()) {
-                emit stopedSpot();
-                return;
+            std::vector<char> buffer(windowTextLength + 1);
+            if (GetWindowTextA(vw.window, buffer.data(), static_cast<int>(buffer.size())) <= 0) {
+                DWORD error = GetLastError();
+                qDebug() << "Failed to get window text. Error code:" << error;
+                msleep(this->ms_checkrate);
+                continue;
             }
             //check titel
             std::string titel = buffer.data();
@@ -385,9 +379,12 @@ bool SpotifyManager::stopSpotify(v_window w)
     // Wait for the process to exit
     DWORD waitResult = WaitForSingleObject(hProcess, 5000);
     if (waitResult == WAIT_FAILED) {
-        // Handle error
         DWORD error = GetLastError();
         std::cerr << "WaitForSingleObject failed with error:" << error << std::endl;
+        CloseHandle(hProcess);
+        return false;
+    } else if (waitResult == WAIT_TIMEOUT) {
+        std::cerr << "Spotify did not exit within 5 seconds" << std::endl;
         CloseHandle(hProcess);
         return false;
     }
@@ -443,7 +440,8 @@ bool SpotifyManager::startSpotify()
     si.cb = sizeof(si);
     PROCESS_INFORMATION pi;
     ZeroMemory(&pi, sizeof(pi));
-    if (!CreateProcessA(NULL, const_cast<char*>(exePath.toStdString().c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))  {
+    std::string exePathStr = exePath.toStdString();
+    if (!CreateProcessA(NULL, const_cast<char*>(exePathStr.c_str()), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))  {
         qDebug() << "CreateProcessA failed: " << GetLastError();
         return false;
     }

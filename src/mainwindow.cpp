@@ -465,7 +465,6 @@ void MainWindow::onOption2Clicked()
 
 void MainWindow::acstatusclicked()
 {
-    qDebug() << this->acstatus->isChecked();
     on_radioButtonStstaus_clicked(this->acstatus->isChecked());
 }
 
@@ -842,35 +841,35 @@ void MainWindow::on_comboBox_delayTime_currentIndexChanged(int index)
 
 void MainWindow::on_pushButtonremovewatermark_clicked()
 {
-     // Temp-Verzeichnis holen
-    QString tempDirPath = QDir::tempPath();
-    QDir tempDir(tempDirPath);
-
-    // Zielpfad im Temp-Ordner
-    QString targetPath = tempDir.filePath("uwd.exe");
-
-    // Datei kopieren (falls noch nicht vorhanden)
-    if (!QFile::exists(targetPath)) {
-        if (!QFile::copy(":/executables/uwd.exe", targetPath)) {
-            QMessageBox::warning(this,
-                                 "Fehler",
-                                 "Kopieren der Datei in den Temp-Ordner fehlgeschlagen.");
-            return;
-        }
+    // Unterordner im Temp-Verzeichnis anlegen
+    QDir subDir(QDir::tempPath() + "/SpotifyEnhancer");
+    if (!subDir.exists() && !subDir.mkpath(".")) {
+        QMessageBox::warning(this, "Fehler", "Unterordner im Temp-Verzeichnis konnte nicht erstellt werden.");
+        return;
     }
 
-    // Explorer öffnen und Datei markieren
-    QString explorerCommand = "explorer.exe";
-    QStringList arguments;
-    arguments << "/select," << QDir::toNativeSeparators(targetPath);
+    // Zielpfad im Unterordner
+    QString targetPath = subDir.filePath("uwd.exe");
 
-    QProcess::startDetached(explorerCommand, arguments);
+    // Datei immer neu kopieren (stellt sicher, dass sie aktuell ist)
+    if (QFile::exists(targetPath))
+        QFile::remove(targetPath);
+
+    if (!QFile::copy(":/executables/uwd.exe", targetPath)) {
+        QMessageBox::warning(this, "Fehler", "Kopieren der Datei fehlgeschlagen.");
+        return;
+    }
+
+    // Explorer öffnen und Datei im Unterordner markieren
+    QProcess::startDetached("explorer.exe",
+                            {"/select," + QDir::toNativeSeparators(targetPath)});
 
     // Hinweis an den Benutzer
     QMessageBox::information(this,
                              "Manueller Start erforderlich",
-                             "Die Datei wurde in den Temp-Ordner kopiert.\n\n"
-                             "Bitte führen Sie 'uwd.exe' manuell aus.");
+                             "Die Datei wurde in den folgenden Ordner kopiert:\n" +
+                             QDir::toNativeSeparators(subDir.absolutePath()) +
+                             "\n\nBitte führen Sie 'uwd.exe' manuell aus.");
 }
 
 
