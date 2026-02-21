@@ -353,28 +353,25 @@ void SpotifyManager::run()
 bool SpotifyManager::stopSpotify(v_window w)
 {
     // Get the process ID associated with the window
-    DWORD processId;
+    DWORD processId = 0;
     GetWindowThreadProcessId(w.window, &processId);
 
-    // Close the Spotify window
-    LRESULT result = SendMessageA(w.window, WM_CLOSE, 0, 0);
-    if (result == 0) {
-        DWORD error = GetLastError();
-        if (error != ERROR_SUCCESS) {
-            // Fehler behandeln
-            std::cerr << "SendMessageA failed with error:" << error << std::endl;
-            return false;
-        }
+    if (processId == 0) {
+        std::cerr << "stopSpotify: could not get process ID" << std::endl;
+        return false;
     }
 
-    // Get a handle to the process
+    // Get a handle to the process BEFORE sending WM_CLOSE (window may vanish after)
     HANDLE hProcess = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_INFORMATION, FALSE, processId);
     if (hProcess == NULL) {
-        // Handle error
         DWORD error = GetLastError();
         std::cerr << "OpenProcess failed with error:" << error << std::endl;
         return false;
     }
+
+    // WM_CLOSE always returns 0 — do NOT check its return value as an error indicator.
+    // Use PostMessage to avoid blocking on any modal dialogs Spotify might show.
+    PostMessage(w.window, WM_CLOSE, 0, 0);
 
     // Wait for the process to exit
     DWORD waitResult = WaitForSingleObject(hProcess, 5000);
@@ -384,35 +381,16 @@ bool SpotifyManager::stopSpotify(v_window w)
         CloseHandle(hProcess);
         return false;
     } else if (waitResult == WAIT_TIMEOUT) {
-        std::cerr << "Spotify did not exit within 5 seconds" << std::endl;
+        // Graceful close failed — force-terminate
+        std::cerr << "Spotify did not exit within 5 seconds, terminating..." << std::endl;
+        TerminateProcess(hProcess, 1);
+        WaitForSingleObject(hProcess, 2000);
         CloseHandle(hProcess);
-        return false;
+        return true; // process is gone now
     }
 
-    // Get the exit code of the process
-    DWORD exitCode;
-    if (!GetExitCodeProcess(hProcess, &exitCode)) {
-        // Handle error
-        DWORD error = GetLastError();
-        std::cerr << "GetExitCodeProcess failed with error:" << error << std::endl;
-        CloseHandle(hProcess);
-        return false;
-    }
-
-    // Close the process handle
-    if(!CloseHandle(hProcess)) {
-        std::cerr << "CloseHandle failed" << std::endl;
-    }
-
-    // Check if the process exited successfully
-    if (exitCode != STILL_ACTIVE) {
-        // Process has exited
-        return true;
-    } else {
-        // Process did not exit within the specified time
-        std::cerr << "WaitForSingleObject timed out" << std::endl;
-        return false;
-    }
+    CloseHandle(hProcess);
+    return true;
 }
 
 void SpotifyManager::setPlayDelay(int newPlayDelay)
