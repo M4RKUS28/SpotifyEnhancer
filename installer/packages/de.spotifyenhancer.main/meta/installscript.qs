@@ -1,14 +1,16 @@
-   function Component() { // default constructor
-   installer.installationFinished.connect(this, Component.prototype.installationFinished);
+function Component() {
+   if (installer) {
+      installer.installationFinished.connect(this, Component.prototype.installationFinished);
+   }
 }
 
 Component.prototype.createOperations = function() {
    component.createOperations();
    if(systemInfo.productType === "windows") {
 
-      component.addOperation("CreateShortcut", "@TargetDir@/bin/SpotifyEnhancer.exe", "@StartMenuDir@/SpotifyEnhancer.lnk", "description=SpotifyEnhancer!!!");
+      component.addOperation("CreateShortcut", "@TargetDir@/bin/SpotifyEnhancer.exe", "@StartMenuDir@/SpotifyEnhancer.lnk", "description=SpotifyEnhancer runs silently in the background and monitors the Spotify window title. As soon as an advertisement is detected, it closes Spotify and immediately restarts it, resuming your music without interaction.");
 
-      component.addOperation("CreateShortcut", "@TargetDir@/bin/SpotifyEnhancer.exe", "@HomeDir@/Desktop/SpotifyEnhancer.lnk", "description=SpotifyEnhancer!!!");
+      component.addOperation("CreateShortcut", "@TargetDir@/bin/SpotifyEnhancer.exe", "@HomeDir@/Desktop/SpotifyEnhancer.lnk", "description=SpotifyEnhancer runs silently in the background and monitors the Spotify window title. As soon as an advertisement is detected, it closes Spotify and immediately restarts it, resuming your music without interaction.");
 
    }
 }

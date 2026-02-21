@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-   <DisplayName>SpotifyEnhancer 1.10.2</DisplayName>
-   <Description>SpotifyEnhancer!!!</Description>
-   <Version>1.10.2</Version>
+   <DisplayName>SpotifyEnhancer 1.11.0</DisplayName>
+   <Description>SpotifyEnhancer runs silently in the background and monitors the Spotify window title. As soon as an advertisement is detected, it closes Spotify and immediately restarts it, resuming your music without interaction.</Description>
+   <Version>1.11.0</Version>
    <Default>true</Default>
-   <ReleaseDate>2024-06-03</ReleaseDate>
-   <Licenses>
-   <License name="GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007" file="license.txt" />
-   </Licenses>
+   <ReleaseDate>2026-02-21</ReleaseDate>
    <Operations>
         <Operation name="Extract">
               <Argument>@TargetDir@/bin/</Argument>
