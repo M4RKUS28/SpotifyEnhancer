@@ -190,7 +190,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->actionAutostart->setChecked( settings.contains("SpotifyEnhancer") );
     ui->autostartBtnMsg->setText(settings.contains("SpotifyEnhancer") ? "Ein " : "Aus ");
     //update exe path if changed!
+    autoStartBtn->blockSignals(true);
     autoStartBtn->setChecked(settings.contains("SpotifyEnhancer"));
+    autoStartBtn->blockSignals(false);
     on_actionAutostart_triggered(ui->actionAutostart->isChecked());
     ui->label_exepath_2->setText( spotmngr->getExePath() );
 
