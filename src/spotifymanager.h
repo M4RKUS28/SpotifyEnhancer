@@ -61,6 +61,7 @@ private:
     void sleep(int seconds);
     void msleep(int m_seconds);
     void loadExePath();
+    void migrateSettings();
 
     QString exePath;
 

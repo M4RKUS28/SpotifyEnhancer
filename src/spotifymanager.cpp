@@ -89,6 +89,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 
 SpotifyManager::SpotifyManager()
 {
+    this->migrateSettings();
     this->loadExePath();
     this->counts = 0;
     this->ms_checkrate = 1000;
@@ -100,6 +101,48 @@ SpotifyManager::SpotifyManager()
 SpotifyManager::~SpotifyManager()
 {
     stop();
+}
+
+void SpotifyManager::migrateSettings()
+{
+    // Migrate from old org/key names to current ones.
+    // Old: QSettings("SpotifyEnhancer", "SpotifyEnhancer") with key "gesammtAnzahlUebersprungeneWerbungen"
+    // New: QSettings("M4RKUS",         "SpotifyEnhancer") with key "gesamtAnzahlUebersprungeneWerbungen"
+
+    QSettings oldS("SpotifyEnhancer", "SpotifyEnhancer");
+    QSettings newS("M4RKUS",         "SpotifyEnhancer");
+
+    // --- exePath ---
+    if (oldS.contains("exePath")) {
+        if (!newS.contains("exePath"))
+            newS.setValue("exePath", oldS.value("exePath"));
+        oldS.remove("exePath");
+    }
+
+    // --- ms_checkrate ---
+    if (oldS.contains("ms_checkrate")) {
+        if (!newS.contains("ms_checkrate"))
+            newS.setValue("ms_checkrate", oldS.value("ms_checkrate"));
+        oldS.remove("ms_checkrate");
+    }
+
+    // --- ad-skip count (org change + key rename) ---
+    const QString oldCountKey = "gesammtAnzahlUebersprungeneWerbungen";
+    const QString newCountKey = "gesamtAnzahlUebersprungeneWerbungen";
+
+    // 1) old org, old key -> new org, new key
+    if (oldS.contains(oldCountKey)) {
+        int oldVal = oldS.value(oldCountKey, 0).toInt();
+        newS.setValue(newCountKey, newS.value(newCountKey, 0).toInt() + oldVal);
+        oldS.remove(oldCountKey);
+    }
+
+    // 2) new org, old key (written before key was renamed) -> new key
+    if (newS.contains(oldCountKey)) {
+        int oldVal = newS.value(oldCountKey, 0).toInt();
+        newS.setValue(newCountKey, newS.value(newCountKey, 0).toInt() + oldVal);
+        newS.remove(oldCountKey);
+    }
 }
 
 void SpotifyManager::startThread()
