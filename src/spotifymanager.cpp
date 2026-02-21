@@ -373,7 +373,9 @@ void SpotifyManager::run()
         }
         msleep(50 + playDelay);
 
-        // searchSpotifyWindow
+        // searchSpotifyWindow — reset vw so the retry loop waits for the new Spotify instance
+        vw.titel  = "";
+        vw.window = nullptr;
         if( ! searchSpotifyWindow(&vw) ) {
             std::cerr << "Couldn't find Spotify after restart" << std::endl;
             break;
